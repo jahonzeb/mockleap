@@ -1,0 +1,320 @@
+{% extends "base/base.html" %}
+{% load static ml_extras %}
+{% block title %}{{ test.title }} — Listening Exam{% endblock %}
+
+{% block body %}
+<div class="flex flex-col" style="height:100vh;background:var(--bg);">
+
+  <!-- Top bar -->
+  <div class="flex items-center gap-4 px-6 border-b flex-shrink-0"
+       style="height:56px;background:var(--bg-2);border-color:var(--border);">
+    <a href="/" class="ml-mark" style="text-decoration:none;font-size:16px;">MockLeap</a>
+    <div class="flex-1 text-sm font-medium truncate" style="color:var(--ink-2);">{{ test.title }}</div>
+    <div class="flex items-center gap-4 flex-shrink-0">
+      <span id="timer" class="tnum text-sm font-semibold"
+            style="font-family:'Geist Mono',monospace;color:var(--ink);">--:--</span>
+      <button type="submit" form="exam-form" class="ml-btn ml-btn-primary ml-btn-sm">Submit all</button>
+    </div>
+  </div>
+
+  <!-- Audio player bar -->
+  <div id="audio-bar"
+       style="flex-shrink:0;background:var(--bg-2);border-bottom:1px solid var(--border);padding:10px 24px;">
+    {% if test.audio_file %}
+    <audio id="main-audio" src="{{ test.audio_file.url }}" preload="metadata"></audio>
+
+    <div style="max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;">
+
+      <!-- Play / state button -->
+      <button id="play-btn" type="button"
+              style="width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;
+                     background:var(--rose);display:flex;align-items:center;justify-content:center;
+                     box-shadow:0 2px 8px rgba(192,62,92,.3);transition:opacity .15s,transform .1s,background .2s;">
+        <!-- idle: play triangle -->
+        <svg id="ico-play" width="13" height="13" viewBox="0 0 16 16" fill="white">
+          <path d="M5 3.5l9 4.5-9 4.5V3.5z"/>
+        </svg>
+        <!-- playing: 3 animated bars -->
+        <span id="ico-bars"
+              style="display:none;flex-direction:row;align-items:flex-end;gap:2px;height:13px;">
+          <span style="display:block;width:3px;height:4px;border-radius:2px;background:white;animation:ml-bar1 .8s ease infinite;"></span>
+          <span style="display:block;width:3px;height:8px;border-radius:2px;background:white;animation:ml-bar2 .8s ease infinite;"></span>
+          <span style="display:block;width:3px;height:5px;border-radius:2px;background:white;animation:ml-bar3 .8s ease infinite;"></span>
+        </span>
+        <!-- ended: checkmark -->
+        <svg id="ico-done" width="13" height="13" viewBox="0 0 16 16" fill="none" style="display:none;">
+          <path d="M3 8l3.5 3.5L13 5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Status -->
+      <div style="flex-shrink:0;min-width:56px;">
+        <div id="st-idle" style="font-size:12px;font-weight:600;color:var(--muted);">Ready</div>
+        <div id="st-live" style="display:none;font-size:12px;font-weight:600;color:var(--rose);">Playing</div>
+        <div id="st-done" style="display:none;font-size:12px;font-weight:600;color:var(--ok);">Finished</div>
+      </div>
+
+      <!-- Separator -->
+      <div style="width:1px;height:18px;background:var(--border);flex-shrink:0;"></div>
+
+      <!-- Elapsed -->
+      <span id="cur-time"
+            style="font-family:'Geist Mono',monospace;font-size:12px;color:var(--muted);
+                   flex-shrink:0;min-width:34px;">0:00</span>
+
+      <!-- Progress (no seek — just display) -->
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--border-2);overflow:hidden;">
+        <div id="progress-fill"
+             style="height:100%;border-radius:2px;background:var(--rose);width:0%;
+                    transition:width .2s linear;"></div>
+      </div>
+
+      <!-- Total -->
+      <span id="dur-time"
+            style="font-family:'Geist Mono',monospace;font-size:12px;color:var(--faint);
+                   flex-shrink:0;min-width:34px;text-align:right;">--:--</span>
+
+      <!-- Separator -->
+      <div style="width:1px;height:18px;background:var(--border);flex-shrink:0;"></div>
+
+      <!-- Volume -->
+      <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+        <svg id="vol-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"
+             style="color:var(--muted);flex-shrink:0;transition:opacity .15s;">
+          <path d="M2 5.5h2.5L8 2.5v11L4.5 10.5H2v-5z" fill="currentColor"/>
+          <path d="M10.5 4.5a4 4 0 010 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input type="range" id="vol-slider" min="0" max="1" step="0.05" value="1"
+               oninput="mlSetVolume(this.value)"
+               style="width:68px;accent-color:var(--rose);cursor:pointer;">
+      </div>
+
+      <!-- Badge -->
+      <div style="padding:3px 9px;border-radius:999px;border:1px solid var(--border);
+                  font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;flex-shrink:0;">
+        Plays once
+      </div>
+    </div>
+
+    {% else %}
+    <div style="max-width:860px;margin:0 auto;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--muted);">
+        <path d="M8 1a5 5 0 00-5 5v3l-1.5 2h13L13 9V6a5 5 0 00-5-5z"
+              stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      <span style="font-size:13px;color:var(--muted);">Audio not available for this test.</span>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Section tabs -->
+  <div class="flex border-b flex-shrink-0 px-4"
+       style="background:var(--bg-2);border-color:var(--border);gap:2px;overflow-x:auto;">
+    {% for section in test.sections.all %}
+    <button type="button" id="tab-{{ forloop.counter0 }}"
+            onclick="mlSwitchSection({{ forloop.counter0 }})"
+            style="padding:0 16px;height:42px;border:none;border-bottom:2px solid transparent;
+                   background:transparent;font-size:13px;font-weight:500;cursor:pointer;
+                   color:var(--muted);transition:color .12s,border-color .12s;white-space:nowrap;flex-shrink:0;">
+      Section {{ section.order }}
+    </button>
+    {% endfor %}
+  </div>
+
+  <!-- Exam form -->
+  <form id="exam-form" method="post" action="{% url 'listening:submit' attempt.pk %}"
+        style="flex:1;overflow-y:auto;">
+    {% csrf_token %}
+
+    {% for section in test.sections.all %}
+    <div id="section-{{ forloop.counter0 }}" class="exam-section"
+         style="{% if not forloop.first %}display:none;{% endif %}padding:32px 32px 48px;">
+      <div style="max-width:720px;margin:0 auto;">
+
+        <!-- Section header -->
+        <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:24px;">
+          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+                       color:var(--muted);flex-shrink:0;">Section {{ section.order }}</span>
+          <span style="font-size:15px;font-weight:600;color:var(--ink);">{{ section.title }}</span>
+          {% if section.description %}
+          <span style="font-size:13px;color:var(--muted);">— {{ section.description }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Questions -->
+        {% for question in section.questions.all %}
+        <div class="flex gap-4 mb-7">
+          <span class="q-num flex-shrink-0">{{ question.number }}</span>
+          <div style="flex:1;min-width:0;">
+            <p class="t-body text-sm mb-3" style="color:var(--ink);">{{ question.text }}</p>
+            {% if question.question_type == 'mcq' %}
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              {% for letter, opt_text in question.choices %}
+              <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;
+                            border-radius:8px;cursor:pointer;border:1px solid var(--border);
+                            transition:background .1s,border-color .1s;"
+                     onmouseover="this.style.background='var(--surface-2)';this.style.borderColor='var(--ink-3)'"
+                     onmouseout="this.style.background='transparent';this.style.borderColor='var(--border)'">
+                <input type="radio" name="q{{ question.pk }}" value="{{ letter }}"
+                       style="accent-color:var(--ink);flex-shrink:0;">
+                <span class="text-sm" style="color:var(--ink);">
+                  <b style="margin-right:6px;">{{ letter }}.</b>{{ opt_text }}
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+            {% else %}
+            <input type="text" name="q{{ question.pk }}" class="ml-input"
+                   style="max-width:300px;" placeholder="Write your answer">
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p style="font-size:13px;color:var(--muted);padding:24px 0;">No questions in this section yet.</p>
+        {% endfor %}
+
+        <!-- Section nav -->
+        <div class="flex items-center justify-between pt-6 mt-2"
+             style="border-top:1px solid var(--border);">
+          {% if not forloop.first %}
+          <button type="button" class="ml-btn ml-btn-ghost ml-btn-sm"
+                  onclick="mlSwitchSection({{ forloop.counter0|add:'-1' }})">
+            ← Previous
+          </button>
+          {% else %}
+          <div></div>
+          {% endif %}
+
+          <span style="font-size:12px;color:var(--muted);">
+            {{ forloop.counter }} / {{ test.sections.all|length }}
+          </span>
+
+          {% if forloop.last %}
+          <button type="submit" class="ml-btn ml-btn-primary ml-btn-sm">
+            Submit exam →
+          </button>
+          {% else %}
+          <button type="button" class="ml-btn ml-btn-primary ml-btn-sm"
+                  onclick="mlSwitchSection({{ forloop.counter0|add:'1' }})">
+            Next section →
+          </button>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+    {% empty %}
+    <div style="padding:64px 32px;text-align:center;color:var(--muted);font-size:14px;">
+      This test has no sections yet.
+    </div>
+    {% endfor %}
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+@keyframes ml-bar1 { 0%,100%{height:4px}  50%{height:12px} }
+@keyframes ml-bar2 { 0%,100%{height:8px}  50%{height:3px}  }
+@keyframes ml-bar3 { 0%,100%{height:5px}  50%{height:11px} }
+
+#play-btn:not([data-locked]):hover {
+  opacity: .85;
+  transform: scale(1.07);
+}
+</style>
+<script>
+// ── Timer ────────────────────────────────────────────────────────────
+new ExamTimer(
+  document.getElementById('timer'),
+  {{ test.duration_minutes }} * 60,
+  () => document.getElementById('exam-form').submit()
+).start();
+
+// ── Section switching ────────────────────────────────────────────────
+function mlSwitchSection(idx) {
+  document.querySelectorAll('.exam-section').forEach((el, i) => {
+    el.style.display = i === idx ? '' : 'none';
+  });
+  document.querySelectorAll('[id^="tab-"]').forEach((tab, i) => {
+    const on = i === idx;
+    tab.style.color            = on ? 'var(--ink)' : 'var(--muted)';
+    tab.style.borderBottomColor = on ? 'var(--ink)' : 'transparent';
+    tab.style.fontWeight       = on ? '600' : '500';
+  });
+  document.getElementById('exam-form').scrollTop = 0;
+}
+
+mlSwitchSection(0);
+
+// ── Audio player (plays once, no pause, no seek) ─────────────────────
+(function () {
+  const audio = document.getElementById('main-audio');
+  if (!audio) return;
+
+  const btn      = document.getElementById('play-btn');
+  const icoPlay  = document.getElementById('ico-play');
+  const icoBars  = document.getElementById('ico-bars');
+  const icoDone  = document.getElementById('ico-done');
+  const stIdle   = document.getElementById('st-idle');
+  const stLive   = document.getElementById('st-live');
+  const stDone   = document.getElementById('st-done');
+  const curEl    = document.getElementById('cur-time');
+  const durEl    = document.getElementById('dur-time');
+  const fill     = document.getElementById('progress-fill');
+  let started    = false;
+
+  function fmt(s) {
+    const m  = Math.floor(s / 60);
+    const ss = String(Math.floor(s % 60)).padStart(2, '0');
+    return m + ':' + ss;
+  }
+
+  audio.addEventListener('loadedmetadata', () => {
+    durEl.textContent = fmt(audio.duration);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    curEl.textContent = fmt(audio.currentTime);
+    if (audio.duration) {
+      fill.style.width = (audio.currentTime / audio.duration * 100).toFixed(2) + '%';
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    icoBars.style.display = 'none';
+    icoDone.style.display  = 'block';
+    btn.style.background   = 'var(--ok)';
+    btn.style.boxShadow    = 'none';
+    btn.setAttribute('data-locked', '');
+    btn.style.cursor       = 'default';
+    stLive.style.display   = 'none';
+    stDone.style.display   = '';
+    fill.style.width       = '100%';
+  });
+
+  btn.addEventListener('click', function () {
+    if (started) return;
+    started = true;
+
+    audio.play().catch(function () {
+      // autoplay blocked — reset so user can try again
+      started = false;
+    });
+
+    icoPlay.style.display  = 'none';
+    icoBars.style.display  = 'flex';
+    stIdle.style.display   = 'none';
+    stLive.style.display   = '';
+    btn.setAttribute('data-locked', '');
+    btn.style.cursor       = 'default';
+  });
+
+  window.mlSetVolume = function (v) {
+    audio.volume = parseFloat(v);
+    const icon = document.getElementById('vol-icon');
+    if (icon) icon.style.opacity = parseFloat(v) < 0.05 ? '0.3' : '1';
+  };
+})();
+</script>
+{% endblock %}

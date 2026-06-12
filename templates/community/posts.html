@@ -1,0 +1,23 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}{{ room.name }}{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div><a href="{% url 'community:rooms' %}" class="t-meta text-xs hover:underline">← Community</a><h1 class="h-display mt-1" style="font-size:24px;">{{ room.name }}</h1></div>
+  <a href="{% url 'community:create_post' room.slug %}" class="ml-btn ml-btn-primary ml-btn-sm">New post</a>
+</div>
+{% if posts %}
+<div class="ml-card overflow-hidden">
+  {% for post in posts %}
+  <a href="{% url 'community:thread' room.slug post.pk %}" class="flex items-start gap-4 px-5 py-4 border-b last:border-b-0 hover:bg-[color:var(--surface-2)] transition-colors" style="border-color:var(--border);">
+    <div class="flex-1 min-w-0">
+      <div class="text-sm font-semibold" style="color:var(--ink);">{{ post.title }}</div>
+      <div class="t-meta text-xs mt-1">{{ post.author.username }} · {{ post.created_at|timesince }} ago · {{ post.replies.count }} replies</div>
+    </div>
+    {% if post.is_pinned %}<span class="ml-chip ml-chip-accent" style="height:20px;font-size:10px;">Pinned</span>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="py-20 text-center"><p class="t-body">No posts yet. Be the first!</p><a href="{% url 'community:create_post' room.slug %}" class="ml-btn ml-btn-primary ml-btn-sm mt-4">Create post</a></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}{{ test.title }} — Edit{% endblock %}
+
+{% block content %}
+
+<div class="flex items-center gap-2 mb-5 text-sm" style="color:var(--muted);">
+  <a href="{% url 'teachers:listening_tests' %}" style="color:var(--muted);text-decoration:none;">Listening Tests</a>
+  <span>›</span>
+  <span style="color:var(--ink);">{{ test.title }}</span>
+</div>
+
+<div style="max-width:820px;">
+
+  <!-- Test settings -->
+  <div class="ml-card mb-5" style="padding:24px;">
+    <div class="flex items-center justify-between mb-4">
+      <div class="t-eyebrow">Test settings</div>
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="toggle_publish">
+        <button type="submit" class="ml-btn ml-btn-sm {% if test.is_published %}ml-btn-ghost{% else %}ml-btn-primary{% endif %}">
+          {% if test.is_published %}Unpublish{% else %}Publish{% endif %}
+        </button>
+      </form>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="update_test">
+      <div class="grid gap-4 mb-4" style="grid-template-columns:1fr 140px;">
+        <div>
+          <label class="t-eyebrow block mb-1">Title</label>
+          <input type="text" name="title" class="ml-input" value="{{ test.title }}" required style="width:100%;">
+        </div>
+        <div>
+          <label class="t-eyebrow block mb-1">Duration (min)</label>
+          <input type="number" name="duration_minutes" class="ml-input" value="{{ test.duration_minutes }}" style="width:100%;">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="t-eyebrow block mb-1">Audio file (single file for entire test)</label>
+        {% if test.audio_file %}
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <audio controls style="height:32px;flex:1;max-width:360px;" src="{{ test.audio_file.url }}"></audio>
+          <span class="t-meta" style="font-size:11px;color:var(--muted);">Upload below to replace</span>
+        </div>
+        {% endif %}
+        <input type="file" name="audio_file" accept="audio/*" class="ml-input" style="width:100%;padding:8px;">
+      </div>
+      <button type="submit" class="ml-btn ml-btn-ghost ml-btn-sm">Save settings</button>
+    </form>
+  </div>
+
+  <!-- Sections list -->
+  <div class="flex items-center justify-between mb-3">
+    <div class="t-eyebrow">Sections ({{ sections|length }})</div>
+    <div class="t-meta">4 sections for a full IELTS test</div>
+  </div>
+
+  {% for section in sections %}
+  <div class="ml-card mb-3" style="padding:0;overflow:hidden;">
+    <div class="flex items-center gap-4 px-5 py-4">
+      <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
+           style="background:var(--surface-2);color:var(--ink);">{{ section.order }}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="text-sm font-semibold" style="color:var(--ink);">{{ section.title }}</div>
+        <div class="t-meta text-xs mt-0.5">
+          {{ section.questions.count }} question{{ section.questions.count|pluralize }}
+        </div>
+      </div>
+      <a href="{% url 'teachers:listening_section_edit' section.pk %}" class="ml-btn ml-btn-ghost ml-btn-sm flex-shrink-0">Edit section</a>
+      <form method="post" style="margin:0;" onsubmit="return confirm('Delete this section and all its questions?')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="delete_section">
+        <input type="hidden" name="section_pk" value="{{ section.pk }}">
+        <button type="submit" class="ml-btn ml-btn-sm" style="color:var(--warn);background:transparent;border:none;cursor:pointer;">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% empty %}
+  <div class="ml-card mb-3 py-8 text-center t-meta">No sections yet. Add one below.</div>
+  {% endfor %}
+
+  <!-- Add section form -->
+  <div class="ml-card" style="padding:24px;margin-top:8px;">
+    <div class="t-eyebrow mb-4">Add section</div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_section">
+      <div class="grid gap-4 mb-4" style="grid-template-columns:70px 1fr;">
+        <div>
+          <label class="t-eyebrow block mb-1">Order</label>
+          <input type="number" name="order" class="ml-input" value="{{ sections|length|add:'1' }}" min="1" style="width:100%;">
+        </div>
+        <div>
+          <label class="t-eyebrow block mb-1">Section title</label>
+          <input type="text" name="title" class="ml-input" required
+                 placeholder="e.g. Section 1 — Social conversation" style="width:100%;">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="t-eyebrow block mb-1">Description (optional)</label>
+        <textarea name="description" class="ml-input" rows="2"
+                  placeholder="Brief description shown to students..."
+                  style="width:100%;font-family:inherit;resize:none;"></textarea>
+      </div>
+      <button type="submit" class="ml-btn ml-btn-primary">Add section →</button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

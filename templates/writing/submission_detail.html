@@ -1,0 +1,24 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Writing Submission{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{% url 'writing:list' %}" class="ml-btn ml-btn-ghost ml-btn-sm">← Back</a>
+    <div><h1 class="h-display" style="font-size:24px;">{{ submission.task.test.title }}</h1><p class="t-meta">{{ submission.task.get_task_type_display }} · {{ submission.created_at|date:"M j, Y" }}</p></div>
+    <span class="ml-chip {% if submission.status == 'reviewed' %}ml-chip-ok{% elif submission.status == 'submitted' %}ml-chip-accent{% else %}ml-chip{% endif %} ml-auto">{{ submission.get_status_display }}</span>
+  </div>
+  {% if submission.overall_band %}
+  <div class="ml-card-2 p-6 mb-6">
+    <div class="t-eyebrow mb-3">Band scores</div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% if submission.band_task_response %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_task_response }}</div><div class="t-meta text-xs mt-1">Task Response</div></div>{% endif %}
+      {% if submission.band_coherence %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_coherence }}</div><div class="t-meta text-xs mt-1">Coherence</div></div>{% endif %}
+      {% if submission.band_lexical %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_lexical }}</div><div class="t-meta text-xs mt-1">Lexical</div></div>{% endif %}
+      {% if submission.band_grammar %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_grammar }}</div><div class="t-meta text-xs mt-1">Grammar</div></div>{% endif %}
+    </div>
+    {% if submission.teacher_comment %}<div class="mt-4 pt-4 border-t" style="border-color:var(--border);"><div class="t-eyebrow mb-2">Teacher feedback</div><p class="t-body leading-7">{{ submission.teacher_comment }}</p></div>{% endif %}
+  </div>
+  {% endif %}
+  <div class="ml-card p-6"><div class="t-eyebrow mb-3">Your response</div><div class="t-body leading-7 whitespace-pre-wrap" style="font-family:'Newsreader',serif;font-size:15px;">{{ submission.content }}</div></div>
+</div>
+{% endblock %}

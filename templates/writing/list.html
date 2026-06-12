@@ -1,0 +1,43 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Writing Tests{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="h-display" style="font-size:28px;">Writing</h1>
+    <p class="t-meta mt-1">60 minutes · 2 tasks · Teacher graded</p>
+  </div>
+</div>
+
+{% if tests %}
+  {% for test in tests %}
+  <div class="mb-8">
+    <div class="t-eyebrow mb-3">{{ test.title }}</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% for task in test.tasks.all %}
+      <div class="ml-card p-5 flex flex-col gap-4">
+        <div>
+          <span class="ml-chip mb-2">{{ task.get_task_type_display }}</span>
+          <p class="t-body text-sm mt-2 line-clamp-3">{{ task.prompt|truncatechars:140 }}</p>
+        </div>
+        <div class="flex items-center gap-3 mt-auto">
+          <span class="t-meta text-xs">{{ task.time_minutes }} min · {{ task.min_words }}+ words</span>
+          {% for sub in submissions %}
+            {% if sub.task.pk == task.pk %}
+              <a href="{% url 'writing:detail' sub.pk %}" class="ml-btn ml-btn-ghost ml-btn-sm" style="margin-left:auto;">View result</a>
+            {% endif %}
+          {% endfor %}
+          <a href="{% url 'writing:exam' task.pk %}" class="ml-btn ml-btn-primary ml-btn-sm" style="margin-left:auto;">Start</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+<div class="py-20 text-center">
+  <div class="text-4xl mb-4">✍️</div>
+  <h3 class="h-display" style="font-size:24px;">No tests yet</h3>
+  <p class="t-body mt-2">Writing tests will appear here once published.</p>
+</div>
+{% endif %}
+{% endblock %}

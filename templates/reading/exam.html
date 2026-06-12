@@ -1,0 +1,368 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}{{ test.title }} — Reading{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ── Layout ─────────────────────────────────────────────── */
+#exam-wrap   { display:flex;flex-direction:column;height:100vh;background:var(--bg); }
+#exam-body   { flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden; }
+.exam-pane   { overflow-y:auto;overflow-x:hidden; }
+
+/* ── Passage tabs ───────────────────────────────────────── */
+.ptab        { padding:0 18px;height:40px;border:none;border-bottom:2px solid transparent;
+               background:transparent;font-size:13px;font-weight:500;cursor:pointer;
+               color:var(--muted);transition:color .12s,border-color .12s;white-space:nowrap; }
+.ptab.active { color:var(--ink);border-bottom-color:var(--ink);font-weight:600; }
+
+/* ── Passage text ───────────────────────────────────────── */
+.passage-body { font-size:15px;line-height:1.85;color:var(--ink);font-family:inherit; }
+.passage-body p { margin-bottom:1.2em; }
+.passage-body p:last-child { margin-bottom:0; }
+
+/* ── Highlights ─────────────────────────────────────────── */
+.hl           { border-radius:2px;cursor:pointer; }
+.hl-yellow    { background:#FDE68A; }
+.hl-green     { background:#BBF7D0; }
+.hl-blue      { background:#BFDBFE; }
+.hl-pink      { background:#FECDD3; }
+
+/* ── Highlight toolbar (floating) ───────────────────────── */
+#hl-toolbar {
+  position:fixed;z-index:100;
+  display:none;
+  align-items:center;gap:4px;
+  padding:5px 8px;
+  background:var(--bg-2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.14);
+}
+#hl-toolbar button {
+  width:22px;height:22px;border-radius:50%;border:2px solid transparent;
+  cursor:pointer;transition:transform .1s,border-color .1s;
+}
+#hl-toolbar button:hover { transform:scale(1.18);border-color:var(--ink); }
+#hl-erase {
+  width:auto!important;height:22px!important;border-radius:6px!important;
+  padding:0 8px;font-size:11px;font-weight:600;background:var(--surface-2);color:var(--muted);
+}
+#hl-erase:hover { border-color:var(--warn)!important;color:var(--warn); }
+
+/* ── Question answer inputs ─────────────────────────────── */
+.q-label     { display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;
+               cursor:pointer;margin-bottom:4px;border:1px solid var(--border);
+               transition:background .1s,border-color .1s; }
+.q-label:hover { background:var(--surface-2); }
+.q-label input:checked + span { font-weight:600;color:var(--ink); }
+
+/* ── Passage section divider in questions ───────────────── */
+.q-passage-hdr { display:flex;align-items:center;gap:10px;margin:20px 0 16px;
+                 padding-bottom:10px;border-bottom:2px solid var(--border); }
+</style>
+{% endblock %}
+
+{% block body %}
+<div id="exam-wrap">
+
+  <!-- ── Top bar ─────────────────────────────────────────────────── -->
+  <div class="flex items-center gap-4 px-5 border-b flex-shrink-0"
+       style="height:52px;background:var(--bg-2);border-color:var(--border);">
+    <a href="/" class="ml-mark" style="text-decoration:none;font-size:15px;">MockLeap</a>
+    <div class="flex-1 text-sm font-medium truncate" style="color:var(--ink-2);">{{ test.title }}</div>
+    <div class="flex items-center gap-3 flex-shrink-0">
+      <span style="font-size:12px;color:var(--muted);">Reading</span>
+      <span id="timer" class="tnum text-sm font-semibold"
+            style="font-family:'Geist Mono',monospace;color:var(--ink);">
+        {{ test.duration_minutes }}:00
+      </span>
+      <button type="submit" form="exam-form" class="ml-btn ml-btn-primary ml-btn-sm">Submit</button>
+    </div>
+  </div>
+
+  <!-- ── Floating highlight toolbar ──────────────────────────────── -->
+  <div id="hl-toolbar">
+    <button title="Yellow"  onclick="applyHighlight('hl-yellow')"  style="background:#FDE68A;"></button>
+    <button title="Green"   onclick="applyHighlight('hl-green')"   style="background:#BBF7D0;"></button>
+    <button title="Blue"    onclick="applyHighlight('hl-blue')"    style="background:#BFDBFE;"></button>
+    <button title="Pink"    onclick="applyHighlight('hl-pink')"    style="background:#FECDD3;"></button>
+    <button id="hl-erase"   onclick="clearHighlights()">Clear all</button>
+  </div>
+
+  <!-- ── Main split: passage | questions ────────────────────────── -->
+  <div id="exam-body">
+
+    <!-- LEFT: passage -->
+    <div class="exam-pane border-r" style="border-color:var(--border);">
+
+      <!-- Passage tabs + highlight hint -->
+      <div class="flex items-center border-b flex-shrink-0 px-2"
+           style="background:var(--bg-2);border-color:var(--border);gap:0;">
+        {% for passage in passages %}
+        <button class="ptab {% if forloop.first %}active{% endif %}"
+                id="ptab-{{ passage.order }}"
+                onclick="switchPassage({{ passage.order }})">
+          Passage {{ passage.order }}
+        </button>
+        {% endfor %}
+        <div class="ml-auto flex items-center gap-1 pr-3" style="font-size:11px;color:var(--muted);">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5 8h6M5 5h6M5 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          Select text to highlight
+        </div>
+      </div>
+
+      <!-- Passage content areas -->
+      {% for passage in passages %}
+      <div id="passage-{{ passage.order }}"
+           class="passage-zone"
+           style="{% if not forloop.first %}display:none;{% endif %}padding:28px 32px 40px;">
+        <div class="t-eyebrow mb-1" style="color:var(--muted);">Passage {{ passage.order }}</div>
+        <h2 style="font-size:21px;font-weight:700;color:var(--ink);margin-bottom:20px;line-height:1.3;">
+          {{ passage.title }}
+        </h2>
+        {% if passage.source %}
+        <div class="t-meta mb-4" style="font-size:12px;">Source: {{ passage.source }}</div>
+        {% endif %}
+        <div class="passage-body" id="ptext-{{ passage.order }}">
+          {% for para in passage.paragraphs %}
+          <p>{{ para }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- RIGHT: questions -->
+    <div class="exam-pane" style="padding:24px 28px 48px;">
+      <form id="exam-form" method="post" action="{% url 'reading:submit' attempt.pk %}">
+        {% csrf_token %}
+
+        {% for passage in passages %}
+        <!-- Passage header in questions pane -->
+        <div class="q-passage-hdr" id="qsec-{{ passage.order }}">
+          <button type="button" onclick="switchPassage({{ passage.order }})"
+                  style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+                         padding:3px 10px;border-radius:6px;border:1px solid var(--border);
+                         background:var(--surface-2);color:var(--muted);cursor:pointer;">
+            Passage {{ passage.order }}
+          </button>
+          <span style="font-size:13px;font-weight:600;color:var(--ink);">{{ passage.title }}</span>
+        </div>
+
+        {% for group in passage.question_groups.all %}
+        <div class="mb-8">
+          <div class="t-eyebrow mb-1" style="color:var(--muted);">{{ group.get_question_type_display }}</div>
+          {% if group.instructions %}
+          <p style="font-size:13px;color:var(--ink-2);margin-bottom:14px;line-height:1.6;font-style:italic;
+                    padding:10px 14px;border-radius:8px;background:var(--surface-2);">
+            {{ group.instructions }}
+          </p>
+          {% endif %}
+
+          {% for question in group.questions.all %}
+          <div class="flex gap-3 mb-5">
+            <span class="q-num flex-shrink-0">{{ question.number }}</span>
+            <div style="flex:1;">
+              <p style="font-size:14px;color:var(--ink);margin-bottom:10px;line-height:1.6;">
+                {{ question.text }}
+              </p>
+
+              {% if group.question_type == 'mcq' %}
+                {% for letter, opt_text in question.choices %}
+                <label class="q-label"
+                       onmouseover="this.style.background='var(--surface-2)'"
+                       onmouseout="if(!this.querySelector('input').checked)this.style.background='transparent'">
+                  <input type="radio" name="q{{ question.pk }}" value="{{ letter }}"
+                         style="margin-top:2px;accent-color:var(--ink);flex-shrink:0;">
+                  <span style="font-size:14px;color:var(--ink);">
+                    <b style="color:var(--ink-2);">{{ letter }}.</b>&nbsp;{{ opt_text }}
+                  </span>
+                </label>
+                {% endfor %}
+
+              {% elif group.question_type == 'tfng' %}
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  {% for val in tfng_values %}
+                  <label style="display:flex;align-items:center;gap:6px;padding:6px 14px;
+                                border-radius:8px;border:1px solid var(--border);cursor:pointer;
+                                font-size:13px;font-weight:500;color:var(--ink-2);transition:background .1s;"
+                         onmouseover="this.style.background='var(--surface-2)'"
+                         onmouseout="this.style.background='transparent'">
+                    <input type="radio" name="q{{ question.pk }}" value="{{ val }}"
+                           style="accent-color:var(--ink);">
+                    {{ val }}
+                  </label>
+                  {% endfor %}
+                </div>
+
+              {% else %}
+                <input type="text" name="q{{ question.pk }}" class="ml-input"
+                       style="max-width:280px;font-size:14px;" placeholder="Write your answer">
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        {% endfor %}
+
+        <button type="submit" class="ml-btn ml-btn-primary ml-btn-lg"
+                style="width:100%;margin-top:8px;">Submit exam</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Timer ──────────────────────────────────────────────────────────
+new ExamTimer(
+  document.getElementById('timer'),
+  {{ test.duration_minutes }} * 60,
+  () => document.getElementById('exam-form').submit()
+).start();
+
+// ── Passage switching ──────────────────────────────────────────────
+function switchPassage(n) {
+  document.querySelectorAll('.passage-zone').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('active'));
+  const zone = document.getElementById('passage-' + n);
+  const tab  = document.getElementById('ptab-' + n);
+  if (zone) zone.style.display = '';
+  if (tab)  tab.classList.add('active');
+
+  // Scroll questions pane to the matching section header
+  const qsec = document.getElementById('qsec-' + n);
+  if (qsec) {
+    const rightPane = qsec.closest('.exam-pane');
+    rightPane.scrollTo({ top: qsec.offsetTop - 12, behavior: 'smooth' });
+  }
+  // Restore highlights for this passage
+  restoreHighlights(n);
+}
+
+// ── Highlighting ──────────────────────────────────────────────────
+const STORAGE_KEY = 'hl-{{ attempt.pk }}';
+let pendingColor = null;
+const toolbar    = document.getElementById('hl-toolbar');
+
+// Show toolbar when user selects text inside a passage
+document.addEventListener('mouseup', (e) => {
+  // Clicked inside the toolbar itself — don't hide
+  if (toolbar.contains(e.target)) return;
+
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || sel.toString().trim() === '') {
+    hideToolbar();
+    return;
+  }
+  // Check selection is inside a passage text zone
+  const anchor = sel.anchorNode;
+  const inPassage = !!anchor?.parentElement?.closest('.passage-body');
+  if (!inPassage) { hideToolbar(); return; }
+
+  const range = sel.getRangeAt(0);
+  const rect  = range.getBoundingClientRect();
+  showToolbar(rect.left + rect.width / 2, rect.top + window.scrollY - 44);
+});
+
+document.addEventListener('mousedown', (e) => {
+  if (!toolbar.contains(e.target)) hideToolbar();
+});
+
+function showToolbar(x, y) {
+  toolbar.style.display = 'flex';
+  toolbar.style.left    = Math.max(8, x - 80) + 'px';
+  toolbar.style.top     = y + 'px';
+}
+function hideToolbar() {
+  toolbar.style.display = 'none';
+}
+
+function applyHighlight(colorClass) {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+
+  const range = sel.getRangeAt(0);
+  const passageEl = range.commonAncestorContainer?.parentElement?.closest('.passage-body')
+                 || range.startContainer?.parentElement?.closest('.passage-body');
+  if (!passageEl) return;
+
+  const span = document.createElement('span');
+  span.className = 'hl ' + colorClass;
+  span.title = 'Click to remove highlight';
+
+  try {
+    range.surroundContents(span);
+  } catch (_) {
+    // Selection spans element boundaries — extract and re-insert
+    const frag = range.extractContents();
+    span.appendChild(frag);
+    range.insertNode(span);
+  }
+
+  // Remove-on-click
+  span.addEventListener('click', function () {
+    const parent = this.parentNode;
+    while (this.firstChild) parent.insertBefore(this.firstChild, this);
+    parent.removeChild(this);
+    saveHighlights();
+  });
+
+  sel.removeAllRanges();
+  hideToolbar();
+  saveHighlights();
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.hl').forEach(span => {
+    const parent = span.parentNode;
+    while (span.firstChild) parent.insertBefore(span.firstChild, span);
+    parent.removeChild(span);
+  });
+  localStorage.removeItem(STORAGE_KEY);
+  hideToolbar();
+}
+
+// ── Persist highlights via localStorage ───────────────────────────
+function saveHighlights() {
+  const data = {};
+  document.querySelectorAll('.passage-body').forEach(el => {
+    const pid = el.id; // ptext-1, ptext-2, ...
+    data[pid] = el.innerHTML;
+  });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(_) {}
+}
+
+function restoreHighlights(passageOrder) {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    const pid  = 'ptext-' + passageOrder;
+    const el   = document.getElementById(pid);
+    if (el && data[pid]) {
+      el.innerHTML = data[pid];
+      // Re-attach click handlers for restored highlights
+      el.querySelectorAll('.hl').forEach(span => {
+        span.addEventListener('click', function () {
+          const parent = this.parentNode;
+          while (this.firstChild) parent.insertBefore(this.firstChild, this);
+          parent.removeChild(this);
+          saveHighlights();
+        });
+      });
+    }
+  } catch(_) {}
+}
+
+// ── Init: restore highlights for the first passage ────────────────
+restoreHighlights(1);
+</script>
+{% endblock %}

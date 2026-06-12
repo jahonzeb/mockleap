@@ -1,0 +1,24 @@
+{% extends "layouts/app.html" %}
+{% load ml_extras %}
+{% block page_title %}Reading Results{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto">
+  <div class="ml-card-2 p-8 text-center mb-8">
+    <div class="t-eyebrow mb-3">{{ attempt.test.title }}</div>
+    <div class="h-serif mb-1" style="font-size:80px;font-weight:600;color:var(--accent);line-height:1;">{{ attempt.band_score|default:"—" }}</div>
+    <div class="t-eyebrow" style="color:var(--muted);">Band Score</div>
+    <div class="flex items-center justify-center gap-8 mt-6 pt-6 border-t" style="border-color:var(--border);">
+      <div><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ attempt.score_raw }}</div><div class="t-meta">Correct</div></div>
+      <div><div class="tnum text-2xl font-semibold" style="color:var(--ink);">40</div><div class="t-meta">Total</div></div>
+      <div><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ attempt.score_raw|multiply:100|divide_by:40|floatformat:0 }}%</div><div class="t-meta">Accuracy</div></div>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <a href="{% url 'reading:list' %}" class="ml-btn ml-btn-ghost flex-1">Try another test</a>
+    <a href="{% url 'dashboard:home' %}" class="ml-btn ml-btn-primary flex-1">Back to dashboard</a>
+  </div>
+</div>
+
+{% endblock %}

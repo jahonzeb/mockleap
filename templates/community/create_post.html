@@ -1,0 +1,18 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}New Post{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto">
+  <div class="mb-4"><a href="{% url 'community:posts' room.slug %}" class="t-meta text-xs hover:underline">← {{ room.name }}</a></div>
+  <div class="ml-card p-6">
+    <h1 class="h-display mb-5" style="font-size:24px;">New post in {{ room.name }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <div class="space-y-4">
+        <div><label class="t-eyebrow block mb-1.5">Title</label><input type="text" name="title" class="ml-input" required placeholder="Post title"></div>
+        <div><label class="t-eyebrow block mb-1.5">Content</label><textarea name="content" rows="8" class="ml-input" style="height:auto;padding-top:10px;" required placeholder="Write your post…"></textarea></div>
+        <div class="flex gap-3"><a href="{% url 'community:posts' room.slug %}" class="ml-btn ml-btn-ghost">Cancel</a><button type="submit" class="ml-btn ml-btn-primary">Publish</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

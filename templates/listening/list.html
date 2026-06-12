@@ -1,0 +1,32 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Listening Tests{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="h-display" style="font-size:28px;">Listening</h1>
+    <p class="t-meta mt-1">40 minutes · 40 questions · 4 sections</p>
+  </div>
+</div>
+
+{% if tests %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+  {% for test in tests %}
+  <div class="ml-card p-5 flex flex-col gap-4">
+    <div>
+      <h3 class="text-sm font-semibold" style="color:var(--ink);">{{ test.title }}</h3>
+      <p class="t-meta mt-1">{{ test.duration_minutes }} min</p>
+    </div>
+    <div class="flex items-center gap-3 mt-auto">
+      <a href="{% url 'listening:exam' test.pk %}" class="ml-btn ml-btn-primary ml-btn-sm" style="margin-left:auto;">Start test</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="py-20 text-center">
+  <div class="text-4xl mb-4">🎧</div>
+  <h3 class="h-display" style="font-size:24px;">No tests yet</h3>
+  <p class="t-body mt-2">Listening tests will appear here once published.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base/base.html" %}
+
+{% block body %}
+<div class="flex min-h-screen">
+
+  {% include "components/sidebar.html" %}
+
+  <!-- Main content area -->
+  <div class="flex-1 flex flex-col min-w-0 md:ml-60">
+    {% block topbar %}
+      {% include "components/topbar.html" %}
+    {% endblock %}
+
+    <main class="flex-1 p-6 md:p-8" id="main-content">
+      {% if messages %}
+        <div class="mb-6 space-y-2">
+          {% for message in messages %}
+            <div class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium
+              {% if message.tags == 'error' %}bg-[color:var(--warn-soft)] text-[color:var(--warn)]
+              {% elif message.tags == 'success' %}bg-[color:var(--ok-soft)] text-[color:var(--ok)]
+              {% else %}bg-[color:var(--surface-2)] text-[color:var(--ink-2)]{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+</div>
+
+<!-- Mobile overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/30 z-20 hidden md:hidden" onclick="document.getElementById('sidebar').classList.add('-translate-x-full');this.classList.add('hidden');"></div>
+
+<script>
+// Override mobile toggle to also show overlay
+const _origToggle = document.getElementById('mobile-menu-btn');
+if (_origToggle) {
+  _origToggle.addEventListener('click', () => {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    const isOpen = !sb.classList.contains('-translate-x-full');
+    if (isOpen) {
+      sb.classList.add('-translate-x-full');
+      ov.classList.add('hidden');
+    } else {
+      sb.classList.remove('-translate-x-full');
+      ov.classList.remove('hidden');
+    }
+  });
+}
+</script>
+{% endblock %}

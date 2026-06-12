@@ -1,0 +1,256 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Speaking — {{ part.get_part_type_display }}{% endblock %}
+
+{% block body %}
+<div class="flex flex-col" style="height:100vh;background:var(--bg);">
+
+  <!-- Top bar -->
+  <div class="flex items-center gap-4 px-6 border-b flex-shrink-0"
+       style="height:56px;background:var(--bg-2);border-color:var(--border);">
+    <div class="ml-mark text-base">MockLeap</div>
+    <div class="text-sm font-medium truncate" style="color:var(--ink-2);">
+      {{ part.test.title }} · {{ part.get_part_type_display }}
+    </div>
+    <div class="ml-auto flex items-center gap-3 flex-shrink-0">
+      <span id="phase-label" class="t-eyebrow" style="color:var(--muted);">READY</span>
+      <span id="timer" class="tnum text-sm font-semibold"
+            style="font-family:'Geist Mono',monospace;color:var(--ink);">
+        {% if part.prep_time_seconds > 0 %}
+          {{ part.prep_time_seconds|floatformat:0 }}s
+        {% else %}
+          {{ part.speak_time_seconds|floatformat:0 }}s
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Split pane -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Left: prompt + cue card -->
+    <div class="overflow-y-auto p-8 border-r flex flex-col gap-5"
+         style="width:50%;border-color:var(--border);">
+      <div class="t-eyebrow" style="color:var(--muted);">{{ part.get_part_type_display }}</div>
+      <div style="font-size:26px;font-weight:600;line-height:1.35;color:var(--ink);">{{ part.prompt }}</div>
+
+      {% if part.cue_card_points_list %}
+      <div class="p-5 rounded-xl" style="background:var(--surface-2);margin-top:4px;">
+        <div class="t-eyebrow mb-3" style="color:var(--muted);">You should say:</div>
+        <ul style="padding-left:18px;list-style:disc;display:flex;flex-direction:column;gap:8px;">
+          {% for point in part.cue_card_points_list %}
+          <li class="text-sm" style="color:var(--ink-2);">{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <!-- Prep time info -->
+      {% if part.prep_time_seconds > 0 %}
+      <div style="font-size:13px;color:var(--muted);">
+        You have <b style="color:var(--ink);">{{ part.prep_time_seconds }} seconds</b> to prepare,
+        then <b style="color:var(--ink);">{{ part.speak_time_seconds }} seconds</b> to speak.
+      </div>
+      {% else %}
+      <div style="font-size:13px;color:var(--muted);">
+        Speak for up to <b style="color:var(--ink);">{{ part.speak_time_seconds }} seconds</b>.
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Right: recorder UI -->
+    <div class="p-8 flex flex-col items-center justify-center gap-6" style="width:50%;">
+
+      <!-- START panel — shown initially for all parts -->
+      <div id="start-panel" class="text-center flex flex-col items-center gap-5">
+        <div class="rounded-full flex items-center justify-center"
+             style="width:80px;height:80px;background:var(--surface-2);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--ink-2)" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="3" width="6" height="12" rx="3"/>
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-sm font-semibold mb-1" style="color:var(--ink);">
+            {% if part.prep_time_seconds > 0 %}Ready to prepare?{% else %}Ready to record?{% endif %}
+          </div>
+          <div class="t-meta" style="color:var(--muted);">
+            Your browser will ask for microphone access.
+          </div>
+        </div>
+        <button type="button" onclick="beginSession()" class="ml-btn ml-btn-primary"
+                style="padding:10px 28px;font-size:14px;">
+          Begin
+        </button>
+        <div id="mic-error" style="display:none;color:var(--warn);font-size:13px;max-width:260px;text-align:center;"></div>
+      </div>
+
+      <!-- PREP panel — hidden initially -->
+      <div id="prep-panel" style="display:none;text-align:center;">
+        <div class="t-eyebrow mb-2" style="color:var(--muted);">Preparation time</div>
+        <div id="prep-display" class="tnum"
+             style="font-family:'Geist Mono',monospace;font-size:64px;font-weight:500;color:var(--ink);line-height:1;">
+          --:--
+        </div>
+        <p class="t-meta mt-4" style="max-width:240px;margin-left:auto;margin-right:auto;color:var(--muted);">
+          Make notes. Recording starts automatically when time is up.
+        </p>
+      </div>
+
+      <!-- RECORD panel — hidden initially -->
+      <div id="record-panel" style="display:none;text-align:center;display:none;">
+        <button id="mic-btn" type="button"
+                style="width:96px;height:96px;border-radius:50%;
+                       display:flex;align-items:center;justify-content:center;margin:0 auto;
+                       background:var(--rose);color:#fff;border:none;cursor:pointer;
+                       box-shadow:0 0 0 0 rgba(192,62,92,.4);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="3" width="6" height="12" rx="3"/>
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+          </svg>
+        </button>
+        <div class="t-eyebrow mt-5" style="color:var(--rose);">● Recording — tap to stop early</div>
+        <div id="rec-timer" class="tnum mt-2"
+             style="font-family:'Geist Mono',monospace;font-size:40px;font-weight:500;color:var(--ink);">
+          00:00
+        </div>
+        <svg id="waveform" width="220" height="56" viewBox="0 0 220 56"
+             class="mt-4 mx-auto" style="display:block;"></svg>
+      </div>
+
+      <!-- DONE panel — hidden initially -->
+      <div id="done-panel" style="display:none;text-align:center;width:100%;max-width:320px;">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--ok-soft);
+                    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5">
+            <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="text-sm font-semibold mb-1" style="color:var(--ink);">Recording complete</div>
+        <div class="t-meta mb-6" style="color:var(--muted);" id="done-duration-label"></div>
+        <form method="post" action="{% url 'speaking:submit' part.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="audio_data" id="audio-data">
+          <input type="hidden" name="duration" id="audio-duration">
+          <button type="submit" class="ml-btn ml-btn-primary ml-btn-lg" style="width:100%;">
+            Submit &amp; continue →
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+@keyframes mic-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(192,62,92,.45); }
+  70%  { box-shadow: 0 0 0 16px rgba(192,62,92,0); }
+  100% { box-shadow: 0 0 0 0 rgba(192,62,92,0); }
+}
+#mic-btn { animation: mic-pulse 1.6s ease-out infinite; }
+</style>
+<script>
+const prepSeconds  = {{ part.prep_time_seconds }};
+const speakSeconds = {{ part.speak_time_seconds }};
+
+let micStream   = null;
+let mediaRec    = null;
+let prepIv      = null;
+let recIv       = null;
+let recElapsed  = 0;
+
+function fmt(s) {
+  return String(Math.floor(s / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
+}
+
+function setTopBar(phase, secs) {
+  document.getElementById('phase-label').textContent = phase;
+  document.getElementById('timer').textContent = fmt(Math.max(0, secs));
+}
+
+async function beginSession() {
+  const errEl = document.getElementById('mic-error');
+  errEl.style.display = 'none';
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    errEl.style.display = '';
+    errEl.textContent = 'Microphone access denied. Please allow microphone access and reload the page.';
+    return;
+  }
+  document.getElementById('start-panel').style.display = 'none';
+  if (prepSeconds > 0) {
+    startPrep();
+  } else {
+    startRecording();
+  }
+}
+
+function startPrep() {
+  const panel = document.getElementById('prep-panel');
+  panel.style.display = '';
+  let t = prepSeconds;
+  document.getElementById('prep-display').textContent = fmt(t);
+  setTopBar('● PREP', t);
+  prepIv = setInterval(() => {
+    t--;
+    document.getElementById('prep-display').textContent = fmt(t);
+    setTopBar('● PREP', t);
+    if (t <= 0) {
+      clearInterval(prepIv);
+      panel.style.display = 'none';
+      startRecording();
+    }
+  }, 1000);
+}
+
+function startRecording() {
+  document.getElementById('record-panel').style.display = '';
+  setTopBar('● REC', speakSeconds);
+
+  const chunks = [];
+  const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+  mediaRec = new MediaRecorder(micStream, mimeType ? { mimeType } : {});
+  const startTime = Date.now();
+
+  mediaRec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+  mediaRec.onstop = () => {
+    clearInterval(recIv);
+    micStream.getTracks().forEach(t => t.stop());
+    const blob = new Blob(chunks, { type: mimeType || 'audio/webm' });
+    const duration = Math.round((Date.now() - startTime) / 1000);
+    showDone(blob, duration);
+  };
+  mediaRec.start(100);
+
+  recIv = setInterval(() => {
+    recElapsed++;
+    document.getElementById('rec-timer').textContent = fmt(recElapsed);
+    setTopBar('● REC', speakSeconds - recElapsed);
+    drawWaveform('waveform', 44, 220, 56, Math.floor(recElapsed % 44), 'var(--rose)', 'rgba(192,62,92,0.18)');
+    if (recElapsed >= speakSeconds) mediaRec.stop();
+  }, 1000);
+
+  document.getElementById('mic-btn').onclick = () => {
+    if (mediaRec && mediaRec.state === 'recording') mediaRec.stop();
+  };
+}
+
+function showDone(blob, duration) {
+  document.getElementById('record-panel').style.display = 'none';
+  document.getElementById('done-panel').style.display = '';
+  document.getElementById('done-duration-label').textContent = fmt(duration) + ' recorded';
+  document.getElementById('audio-duration').value = duration;
+  setTopBar('DONE', 0);
+  document.getElementById('timer').textContent = '';
+  const reader = new FileReader();
+  reader.onloadend = () => { document.getElementById('audio-data').value = reader.result; };
+  reader.readAsDataURL(blob);
+}
+</script>
+{% endblock %}

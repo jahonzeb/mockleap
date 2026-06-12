@@ -1,0 +1,44 @@
+<footer class="border-t mt-auto py-12" style="border-color:var(--border);background:var(--bg-2);">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-10">
+      <div class="col-span-2 md:col-span-1">
+        {% include "components/brand.html" %}
+        <p class="t-meta mt-3 max-w-xs">Real exam conditions, real band scores. Prepare smarter for IELTS.</p>
+      </div>
+      <div>
+        <p class="t-eyebrow mb-3">Product</p>
+        <ul class="space-y-2">
+          <li><a href="{% url 'core:features' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Features</a></li>
+          <li><a href="{% url 'core:pricing' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Pricing</a></li>
+          <li><a href="{% url 'account_signup' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Get started</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="t-eyebrow mb-3">Practice</p>
+        <ul class="space-y-2">
+          <li><a href="{% url 'reading:list' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Reading</a></li>
+          <li><a href="{% url 'listening:list' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Listening</a></li>
+          <li><a href="{% url 'writing:list' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Writing</a></li>
+          <li><a href="{% url 'speaking:list' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Speaking</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="t-eyebrow mb-3">Community</p>
+        <ul class="space-y-2">
+          <li><a href="{% url 'community:rooms' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Forums</a></li>
+          <li><a href="{% url 'rankings:leaderboard' %}" class="t-body text-sm hover:text-[color:var(--ink)]">Leaderboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="t-eyebrow mb-3">Company</p>
+        <ul class="space-y-2">
+          <li><a href="{% url 'core:about' %}" class="t-body text-sm hover:text-[color:var(--ink)]">About</a></li>
+          <li><a href="{% url 'core:faq' %}" class="t-body text-sm hover:text-[color:var(--ink)]">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="pt-6 border-t flex flex-col md:flex-row items-center gap-3 justify-between" style="border-color:var(--border);">
+      <p class="t-meta">© {% now "Y" %} MockLeap. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,81 @@
+{% extends "base/base.html" %}
+{% load allauth account %}
+
+{% block title %}Create account{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex" style="background:var(--bg);">
+
+  <!-- Left: brand panel -->
+  <div class="hidden lg:flex flex-col justify-between w-96 p-10 flex-shrink-0" style="background:var(--ink);color:var(--bg-2);">
+    <a href="/" class="ml-mark" style="color:var(--bg-2);text-decoration:none;">
+      <span class="ml-mark-dot"></span>
+      <span>MockLeap</span>
+    </a>
+    <div class="space-y-4">
+      <div class="flex items-start gap-3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-body" style="color:rgba(242,232,208,0.8);">Full-length mock tests under real exam conditions</span></div>
+      <div class="flex items-start gap-3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-body" style="color:rgba(242,232,208,0.8);">AI-graded Writing and Speaking with band scores</span></div>
+      <div class="flex items-start gap-3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-body" style="color:rgba(242,232,208,0.8);">Progress tracking and streak system</span></div>
+      <div class="flex items-start gap-3"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-body" style="color:rgba(242,232,208,0.8);">100% free — no card required</span></div>
+    </div>
+    <div class="t-meta" style="color:rgba(242,232,208,0.4);">© {% now "Y" %} MockLeap</div>
+  </div>
+
+  <!-- Right: form -->
+  <div class="flex-1 flex items-center justify-center px-6 py-16">
+    <div class="w-full max-w-sm">
+      <div class="lg:hidden mb-8">
+        <a href="/" class="ml-mark" style="text-decoration:none;"><span class="ml-mark-dot"></span><span>MockLeap</span></a>
+      </div>
+
+      <h1 class="h-display" style="font-size:32px;">Create your account</h1>
+      <p class="t-body mt-2">Join 312,000+ students preparing for IELTS.</p>
+
+      {% if form.errors %}
+        <div class="mt-4 p-3 rounded-xl text-sm" style="background:var(--warn-soft);color:var(--warn);">
+          {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}{% endfor %}{% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'account_signup' %}" class="mt-8 space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="t-eyebrow block mb-1.5" for="id_username">Username</label>
+          <input type="text" name="username" id="id_username" autocomplete="username" required
+                 class="ml-input" placeholder="yourname"
+                 value="{{ form.username.value|default:'' }}">
+        </div>
+        <div>
+          <label class="t-eyebrow block mb-1.5" for="id_email">Email</label>
+          <input type="email" name="email" id="id_email" autocomplete="email" required
+                 class="ml-input" placeholder="you@example.com"
+                 value="{{ form.email.value|default:'' }}">
+        </div>
+        <div>
+          <label class="t-eyebrow block mb-1.5" for="id_password1">Password</label>
+          <input type="password" name="password1" id="id_password1" autocomplete="new-password" required
+                 class="ml-input" placeholder="8+ characters">
+        </div>
+        <div>
+          <label class="t-eyebrow block mb-1.5" for="id_password2">Confirm password</label>
+          <input type="password" name="password2" id="id_password2" autocomplete="new-password" required
+                 class="ml-input" placeholder="Same password again">
+        </div>
+        {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
+        <button type="submit" class="ml-btn ml-btn-accent" style="width:100%;height:44px;font-size:15px;">
+          Create free account
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <p class="t-meta text-center mt-6">
+        Already have an account?
+        <a href="{% url 'account_login' %}" class="font-semibold hover:underline" style="color:var(--ink);">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

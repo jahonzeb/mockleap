@@ -1,0 +1,179 @@
+{% load static %}
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-60 flex flex-col border-r -translate-x-full md:translate-x-0 transition-transform duration-200"
+       style="background:var(--bg-2);border-color:var(--border);">
+
+  <!-- Brand -->
+  <div class="h-16 flex items-center px-5 border-b flex-shrink-0" style="border-color:var(--border);">
+    {% include "components/brand.html" %}
+  </div>
+
+  <!-- Nav items -->
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-0.5" role="navigation" aria-label="Sidebar navigation">
+    <a href="{% url 'dashboard:home' %}" class="nav-item {% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="flex-shrink-0"><rect x="1" y="1" width="6" height="6" rx="2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="2" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="2" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="2" stroke="currentColor" stroke-width="1.4"/></svg>
+      Dashboard
+    </a>
+
+    <p class="t-eyebrow px-2.5 pt-4 pb-1">Practice</p>
+
+    <a href="{% url 'reading:list' %}" class="nav-item {% if request.resolver_match.app_name == 'reading' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Reading
+    </a>
+    <a href="{% url 'listening:list' %}" class="nav-item {% if request.resolver_match.app_name == 'listening' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 015 5v2a5 5 0 01-10 0V6a5 5 0 015-5z" stroke="currentColor" stroke-width="1.4"/><path d="M8 13v2M6 15h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Listening
+    </a>
+    <a href="{% url 'writing:list' %}" class="nav-item {% if request.resolver_match.app_name == 'writing' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 12.5L3.5 14 13 4.5 11.5 3 2 12.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M2 12.5V14h1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Writing
+    </a>
+    <a href="{% url 'speaking:list' %}" class="nav-item {% if request.resolver_match.app_name == 'speaking' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7.5c0-.828.672-1.5 1.5-1.5h2a1.5 1.5 0 010 3H7A1.5 1.5 0 015.5 7.5z" stroke="currentColor" stroke-width="1.4"/></svg>
+      Speaking
+    </a>
+
+    <p class="t-eyebrow px-2.5 pt-4 pb-1">More</p>
+
+    <a href="{% url 'rankings:leaderboard' %}" class="nav-item {% if request.resolver_match.app_name == 'rankings' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.545 3.13L13 5.635l-2.5 2.435.59 3.44L8 9.763l-3.09 1.746.59-3.44L3 5.636l3.455-.506L8 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Rankings
+    </a>
+    <a href="{% url 'community:rooms' %}" class="nav-item {% if request.resolver_match.app_name == 'community' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 10.5c0 .828-.672 1.5-1.5 1.5H5l-3 2V4.5C2 3.672 2.672 3 3.5 3h9c.828 0 1.5.672 1.5 1.5v6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Community
+    </a>
+    <a href="{% url 'notifications:list' %}" class="nav-item {% if request.resolver_match.app_name == 'notifications' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 00-5 5v3l-1.5 2h13L13 9V6a5 5 0 00-5-5zM6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Notifications
+      {% if unread_count %}<span class="ml-chip ml-chip-warn ml-auto text-xs" style="height:18px;padding:0 6px;">{{ unread_count }}</span>{% endif %}
+    </a>
+
+    {% if user.role == 'teacher' %}
+    <p class="t-eyebrow px-2.5 pt-4 pb-1">Teacher</p>
+    <a href="{% url 'teachers:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'teachers' %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Review Queue
+    </a>
+    <a href="{% url 'teachers:reading_tests' %}" class="nav-item {% if request.resolver_match.app_name == 'teachers' and 'reading' in request.resolver_match.url_name %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4"/><path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Reading Tests
+    </a>
+    <a href="{% url 'teachers:listening_tests' %}" class="nav-item {% if request.resolver_match.app_name == 'teachers' and 'listening' in request.resolver_match.url_name %}active{% endif %}">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 015 5v2a5 5 0 01-10 0V6a5 5 0 015-5z" stroke="currentColor" stroke-width="1.4"/><path d="M8 13v2M6 15h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Listening Tests
+    </a>
+    {% endif %}
+  </nav>
+
+  <!-- Bottom: profile with click dropdown -->
+  <div class="border-t flex-shrink-0" style="border-color:var(--border);position:relative;" id="ml-profile-zone">
+
+    <!-- Popup — hidden by default via visibility/opacity, no display toggling -->
+    <div id="ml-profile-popup" style="
+        position:absolute;left:12px;right:12px;bottom:calc(100% + 8px);
+        background:var(--bg-2);border:1px solid var(--border);
+        border-radius:12px;
+        box-shadow:0 1px 0 rgba(14,27,46,.04),0 24px 60px -16px rgba(14,27,46,.30);
+        padding:4px;z-index:50;
+        visibility:hidden;opacity:0;
+        transform:translateY(6px);
+        transition:opacity .15s,transform .15s,visibility .15s;">
+      <a href="{% url 'accounts:profile' %}" class="ml-pmenu-item" id="ml-pm-profile">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Profile
+      </a>
+      <a href="{% url 'accounts:settings' %}" class="ml-pmenu-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.4"/><path d="M13.3 7a5.7 5.7 0 00-.1-.9l1.4-1.1-1.3-2.3-1.7.7a5.5 5.5 0 00-1.5-.9L9.8 1h-2.6L6.9 2.5a5.5 5.5 0 00-1.5.9l-1.7-.7L2.4 5l1.4 1.1a5.7 5.7 0 000 1.8L2.4 9l1.3 2.3 1.7-.7c.5.4 1 .7 1.5.9L7.2 13h2.6l.3-1.5c.5-.2 1-.5 1.5-.9l1.7.7L14.6 9l-1.4-1.1c.1-.3.1-.6.1-.9z" stroke="currentColor" stroke-width="1.4"/></svg>
+        Settings
+      </a>
+      {% if user.is_staff %}
+      <a href="/admin/" class="ml-pmenu-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Admin panel
+      </a>
+      {% endif %}
+      <div style="height:1px;background:var(--border);margin:4px 0;"></div>
+      <form method="post" action="{% url 'account_logout' %}" style="margin:0;">
+        {% csrf_token %}
+        <button type="submit" class="ml-pmenu-item ml-pmenu-danger" style="width:100%;text-align:left;border:none;cursor:pointer;font-family:inherit;background:transparent;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M10.5 11L14 8l-3.5-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 8H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Log out
+        </button>
+      </form>
+    </div>
+
+    <!-- Profile trigger button -->
+    <button id="ml-profile-btn" type="button" style="
+        width:100%;display:flex;align-items:center;gap:10px;
+        padding:12px 16px;border:none;cursor:pointer;
+        background:transparent;font-family:inherit;
+        transition:background .12s;">
+      {% if user.avatar %}
+        <img src="{{ user.avatar.url }}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+      {% else %}
+        <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;background:var(--accent-soft);color:var(--ink);">{{ user.username|first|upper }}</div>
+      {% endif %}
+      <div style="min-width:0;flex:1;text-align:left;">
+        <p style="font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">{{ user.get_full_name|default:user.username }}</p>
+        <p style="font-size:11px;color:var(--muted);margin:0;">{{ user.xp }} XP</p>
+      </div>
+      <svg id="ml-profile-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" style="color:var(--muted);flex-shrink:0;transition:transform .2s;">
+        <path d="M2 8l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</aside>
+
+<style>
+.ml-pmenu-item {
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:8px;
+  font-size:12px;font-weight:500;color:var(--ink);
+  text-decoration:none;cursor:pointer;
+  transition:background .1s;
+}
+.ml-pmenu-item:hover { background:var(--surface-2); }
+.ml-pmenu-danger { color:var(--warn) !important; }
+.ml-pmenu-danger:hover { background:var(--warn-soft) !important; }
+#ml-profile-btn:hover { background:var(--surface-2); }
+</style>
+
+<script>
+(function () {
+  var btn = document.getElementById('ml-profile-btn');
+  var popup = document.getElementById('ml-profile-popup');
+  var chevron = document.getElementById('ml-profile-chevron');
+  if (!btn || !popup) return;
+
+  var isOpen = false;
+
+  function open() {
+    isOpen = true;
+    popup.style.visibility = 'visible';
+    popup.style.opacity = '1';
+    popup.style.transform = 'translateY(0)';
+    chevron.style.transform = 'rotate(180deg)';
+  }
+
+  function close() {
+    isOpen = false;
+    popup.style.opacity = '0';
+    popup.style.transform = 'translateY(6px)';
+    popup.style.visibility = 'hidden';
+    chevron.style.transform = 'rotate(0deg)';
+  }
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    isOpen ? close() : open();
+  });
+
+  document.addEventListener('click', function (e) {
+    if (isOpen) {
+      var zone = document.getElementById('ml-profile-zone');
+      if (zone && !zone.contains(e.target)) close();
+    }
+  });
+}());
+</script>
