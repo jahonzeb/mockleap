@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+{% load allauth account %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex" style="background:var(--bg);">
+
+  <!-- Left: brand panel -->
+  <div class="hidden lg:flex flex-col justify-between w-96 p-10 flex-shrink-0" style="background:var(--ink);color:var(--bg-2);">
+    <a href="/" class="ml-mark" style="color:var(--bg-2);text-decoration:none;">
+      <span class="ml-mark-dot"></span>
+      <span>MockLeap</span>
+    </a>
+    <div>
+      <p class="h-serif" style="font-size:28px;line-height:1.4;color:var(--bg-2);">"MockLeap is the only platform where I walked into the exam already exhausted of being nervous."</p>
+      <div class="flex items-center gap-3 mt-6">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0" style="background:#1F3A68;color:#fff;">AS</div>
+        <div>
+          <div class="text-sm font-semibold" style="color:var(--bg-2);">Aigerim S.</div>
+          <div class="t-meta" style="color:rgba(242,232,208,0.6);">Band 8.0 · Almaty</div>
+        </div>
+      </div>
+    </div>
+    <div class="t-meta" style="color:rgba(242,232,208,0.4);">© {% now "Y" %} MockLeap</div>
+  </div>
+
+  <!-- Right: form -->
+  <div class="flex-1 flex items-center justify-center px-6 py-16">
+    <div class="w-full max-w-sm">
+      <div class="lg:hidden mb-8">
+        <a href="/" class="ml-mark" style="text-decoration:none;"><span class="ml-mark-dot"></span><span>MockLeap</span></a>
+      </div>
+
+      <h1 class="h-display" style="font-size:32px;">Welcome back</h1>
+      <p class="t-body mt-2">Sign in to continue your IELTS prep.</p>
+
+      {% if form.errors %}
+        <div class="mt-4 p-3 rounded-xl text-sm" style="background:var(--warn-soft);color:var(--warn);">
+          {% for field, errors in form.errors.items %}{% for error in errors %}{{ error }}{% endfor %}{% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'account_login' %}" class="mt-8 space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="t-eyebrow block mb-1.5" for="id_login">Email</label>
+          <input type="email" name="login" id="id_login" autocomplete="email" required
+                 class="ml-input" placeholder="you@example.com"
+                 value="{{ form.login.value|default:'' }}">
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="t-eyebrow" for="id_password">Password</label>
+            <a href="{% url 'account_reset_password' %}" class="t-meta text-xs hover:underline">Forgot?</a>
+          </div>
+          <input type="password" name="password" id="id_password" autocomplete="current-password" required
+                 class="ml-input" placeholder="••••••••">
+        </div>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" name="remember" class="rounded" style="accent-color:var(--ink);">
+          <span class="t-body text-sm">Stay signed in</span>
+        </label>
+        {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
+        <button type="submit" class="ml-btn ml-btn-primary w-full" style="width:100%;">Sign in</button>
+      </form>
+
+      <p class="t-meta text-center mt-6">
+        Don't have an account?
+        <a href="{% url 'account_signup' %}" class="font-semibold hover:underline" style="color:var(--ink);">Sign up free</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

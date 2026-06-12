@@ -1,0 +1,620 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Free IELTS Mock Tests{% endblock %}
+
+{% block extra_head %}
+<style>
+.ml-row{display:flex;align-items:center;}
+.tab-content-block{display:none;}
+.tab-content-block.active{display:grid;}
+.tab-btn{background:transparent;color:var(--ink-2);border-color:transparent;box-shadow:none;}
+.tab-btn.active{background:var(--ink);color:var(--bg-2);}
+.faq-answer{display:none;}
+.faq-item.open .faq-answer{display:block;}
+.faq-item.open .icon-plus{display:none;}
+.faq-item.open .icon-minus{display:inline-flex;}
+.icon-minus{display:none;}
+.ml-hl-yellow{background:linear-gradient(transparent 50%,#FDE7A4 50%);padding:0 1px;}
+.ml-hl-pink{background:linear-gradient(transparent 50%,#F9CEDA 50%);padding:0 1px;}
+.ml-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-family:'Geist Mono',monospace;font-size:11.5px;font-weight:500;background:var(--surface-2);color:var(--ink-2);border:.5px solid var(--border);flex-shrink:0;}
+.ml-num-active{background:var(--ink);color:var(--bg-2);border-color:var(--ink);}
+.ml-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border-2);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ml-radio-on{border-color:var(--ink);}
+.ml-radio-on::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--ink);}
+@keyframes blink{50%{opacity:0;}}
+</style>
+{% endblock %}
+
+{% block body %}
+<div style="position:relative;z-index:1;">
+
+<!-- NAV -->
+<nav class="ml-row" style="height:72px;padding:0 60px;justify-content:space-between;border-bottom:.5px solid var(--border);background:var(--bg-2);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);">
+  <div class="ml-row" style="gap:36px;">
+    <a href="/" class="ml-mark" style="text-decoration:none;">
+      <span class="ml-mark-dot" style="width:8px;height:8px;"></span>
+      <span>MockLeap</span>
+    </a>
+    <div class="ml-row" style="gap:28px;" class="hidden md:flex">
+      <a href="{% url 'reading:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Reading</a>
+      <a href="{% url 'listening:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Listening</a>
+      <a href="{% url 'writing:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Writing</a>
+      <a href="{% url 'speaking:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Speaking</a>
+      <a href="{% url 'community:rooms' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Community</a>
+    </div>
+  </div>
+  <div class="ml-row" style="gap:12px;">
+    <button onclick="DarkMode.toggle()" class="ml-btn ml-btn-ghost ml-btn-sm" style="padding:0;min-width:36px;" aria-label="Toggle dark mode">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M8 5a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    {% if user.is_authenticated %}
+      <a href="{% url 'dashboard:home' %}" class="ml-btn ml-btn-ghost ml-btn-sm">Dashboard</a>
+    {% else %}
+      <a href="{% url 'account_login' %}" class="ml-btn ml-btn-ghost ml-btn-sm">Sign in</a>
+      <a href="{% url 'account_signup' %}" class="ml-btn ml-btn-accent ml-btn-sm">
+        Start free
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="padding:88px 60px 0;position:relative;">
+  <div class="ml-row" style="gap:10px;margin-bottom:32px;">
+    <span class="ml-chip ml-chip-accent" style="height:28px;padding:0 12px;font-size:12px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.6 4.4 4.4 1.6-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zM19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+      AI examiner — now in Speaking &amp; Writing
+    </span>
+    <span class="t-meta">·</span>
+    <span class="t-meta">Joined by <b style="color:var(--ink-2);">312,604</b> learners this month</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:80px;align-items:start;">
+    <div>
+      <h1 class="h-display" style="font-size:clamp(52px,7vw,92px);max-width:720px;">
+        Practice IELTS like the <em>real exam</em>&thinsp;—&thinsp;completely free.
+      </h1>
+      <p class="t-lead" style="margin-top:28px;max-width:540px;font-size:19px;">
+        Full-length Academic &amp; General Training mocks, timed under exam conditions, with AI-graded Writing and Speaking — calibrated to the official band descriptors.
+      </p>
+      <div class="ml-row" style="gap:12px;margin-top:36px;">
+        <a href="{% url 'account_signup' %}" class="ml-btn ml-btn-accent ml-btn-lg" style="padding-right:22px;">
+          Start Mock Test
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="{% url 'writing:list' %}" class="ml-btn ml-btn-ghost ml-btn-lg">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11.5-11.5a2 2 0 0 0-2.8-2.8L5 16l-1 4z"/></svg>
+          Check my Writing
+        </a>
+      </div>
+      <div class="ml-row" style="gap:24px;margin-top:32px;">
+        <div class="ml-row" style="gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-meta">No card · No trial</span></div>
+        <div class="ml-row" style="gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-meta">Official-style materials</span></div>
+        <div class="ml-row" style="gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9 17.5L20 6.5"/></svg><span class="t-meta">Results in &lt; 60s</span></div>
+      </div>
+    </div>
+
+    <!-- Hero composition -->
+    <div style="position:relative;width:100%;height:540px;">
+      <div style="position:absolute;top:30px;right:-40px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--accent) 0%,var(--accent-2) 60%,transparent 100%);opacity:.18;filter:blur(4px);pointer-events:none;"></div>
+      <svg width="280" height="280" viewBox="0 0 280 280" style="position:absolute;top:60px;right:30px;opacity:.35;color:var(--ink);pointer-events:none;">
+        <circle cx="140" cy="140" r="120" fill="none" stroke="currentColor" stroke-width=".5" stroke-dasharray="2 6"/>
+        <circle cx="140" cy="140" r="80" fill="none" stroke="currentColor" stroke-width=".5" stroke-dasharray="2 6"/>
+      </svg>
+
+      <!-- Band score card -->
+      <div class="ml-card-2" style="position:absolute;top:40px;left:0;width:340px;padding:24px;border-radius:20px;">
+        <div class="ml-row" style="justify-content:space-between;margin-bottom:14px;">
+          <span class="t-eyebrow">Last mock test</span>
+          <span class="ml-chip" style="height:22px;font-size:11px;">Academic · Test 14</span>
+        </div>
+        <div class="ml-row" style="gap:20px;align-items:flex-end;">
+          <div style="position:relative;width:140px;height:140px;flex-shrink:0;">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle cx="70" cy="70" r="63" fill="none" stroke="var(--border)" stroke-width="6"/>
+              <circle cx="70" cy="70" r="63" fill="none" stroke="var(--accent)" stroke-width="6" stroke-dasharray="329.9 395.8" stroke-linecap="round" transform="rotate(-90 70 70)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;">
+              <div style="font-family:'Newsreader',serif;font-weight:600;font-size:49px;color:var(--ink);">7.5</div>
+              <div class="t-eyebrow" style="margin-top:4px;font-size:10px;">Overall</div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:14px;">
+            {% for skill, band, pct, color in hero_bands %}
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:13px;font-weight:500;color:var(--ink-2);">{{ skill }}</span><span class="tnum" style="font-family:'Newsreader',serif;font-size:16px;font-weight:600;">{{ band }}</span></div>
+              <div style="height:8px;background:var(--inset);border-radius:99px;overflow:hidden;"><div style="height:100%;width:{{ pct }}%;background:{{ color }};border-radius:99px;"></div></div>
+            </div>
+            {% empty %}
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:13px;font-weight:500;color:var(--ink-2);">Listening</span><span class="tnum" style="font-family:'Newsreader',serif;font-size:16px;font-weight:600;">8.0</span></div><div style="height:8px;background:var(--inset);border-radius:99px;overflow:hidden;"><div style="height:100%;width:88.9%;background:#1F3A68;border-radius:99px;"></div></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:13px;font-weight:500;color:var(--ink-2);">Reading</span><span class="tnum" style="font-family:'Newsreader',serif;font-size:16px;font-weight:600;">7.5</span></div><div style="height:8px;background:var(--inset);border-radius:99px;overflow:hidden;"><div style="height:100%;width:83.3%;background:#7E4EC0;border-radius:99px;"></div></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:13px;font-weight:500;color:var(--ink-2);">Writing</span><span class="tnum" style="font-family:'Newsreader',serif;font-size:16px;font-weight:600;">7.0</span></div><div style="height:8px;background:var(--inset);border-radius:99px;overflow:hidden;"><div style="height:100%;width:77.8%;background:#C03E5C;border-radius:99px;"></div></div></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:13px;font-weight:500;color:var(--ink-2);">Speaking</span><span class="tnum" style="font-family:'Newsreader',serif;font-size:16px;font-weight:600;">7.5</span></div><div style="height:8px;background:var(--inset);border-radius:99px;overflow:hidden;"><div style="height:100%;width:83.3%;background:#0E9488;border-radius:99px;"></div></div></div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- AI feedback card -->
+      <div class="ml-card" style="position:absolute;top:320px;left:80px;width:320px;padding:18px;border-radius:16px;background:var(--ink);color:var(--bg-2);border-color:transparent;">
+        <div class="ml-row" style="gap:10px;margin-bottom:10px;">
+          <div style="width:28px;height:28px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--on-accent);flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.6 4.4 4.4 1.6-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zM19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg></div>
+          <span class="t-eyebrow" style="color:rgba(242,232,208,0.7);">AI Examiner</span>
+          <span class="ml-chip" style="height:18px;font-size:10px;margin-left:auto;background:rgba(245,181,68,0.15);color:var(--accent);border-color:transparent;">Writing · Task 2</span>
+        </div>
+        <p style="margin:0;font-family:'Newsreader',serif;font-size:18px;line-height:1.4;font-style:italic;">"A confident discussion of both views — but your paragraph two lacks a clear topic sentence. Try opening with the controlling idea."</p>
+        <div class="ml-row" style="gap:8px;margin-top:14px;font-size:11px;color:rgba(242,232,208,0.55);">
+          <span>Task response: <b style="color:var(--accent);">7.0</b></span>
+          <span>·</span>
+          <span>Coherence: <b style="color:var(--accent);">7.5</b></span>
+          <span>·</span>
+          <span>Lexical: <b style="color:var(--accent);">6.5</b></span>
+        </div>
+      </div>
+
+      <!-- Streak card -->
+      <div class="ml-card" style="position:absolute;bottom:40px;right:80px;width:220px;padding:14px;border-radius:14px;">
+        <div class="ml-row" style="justify-content:space-between;">
+          <span class="t-eyebrow">Streak</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s4 4 4 8a4 4 0 1 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7z"/></svg>
+        </div>
+        <div style="font-family:'Newsreader',serif;font-size:36px;font-weight:600;margin-top:4px;">42 <span style="font-size:14px;color:var(--muted);font-family:'Geist',sans-serif;">days</span></div>
+        <div class="ml-row" style="gap:6px;margin-top:10px;">
+          {% for day, active in streak_days %}
+          <div style="flex:1;height:26px;border-radius:5px;background:{% if active %}var(--accent){% else %}var(--inset){% endif %};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:{% if active %}var(--on-accent){% else %}var(--muted){% endif %};">{{ day }}</div>
+          {% empty %}
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--on-accent);">M</div>
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--on-accent);">T</div>
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--on-accent);">W</div>
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--on-accent);">T</div>
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--on-accent);">F</div>
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--on-accent);">S</div>
+          <div style="flex:1;height:26px;border-radius:5px;background:var(--inset);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--muted);">S</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Speaking waveform card -->
+      <div class="ml-card" style="position:absolute;top:0;right:0;width:200px;padding:14px;border-radius:14px;">
+        <div class="ml-row" style="gap:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--rose);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+          <div style="flex:1;">
+            <div class="t-eyebrow" style="font-size:9px;">Speaking · Part 2</div>
+            <div class="tnum" style="font-size:13px;font-family:'Geist Mono',monospace;">0:42 / 2:00</div>
+          </div>
+        </div>
+        <svg id="speakWave" width="172" height="36" viewBox="0 0 172 36" style="margin-top:8px;display:block;"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<div style="padding:32px 60px;margin-top:96px;border-top:.5px solid var(--border);border-bottom:.5px solid var(--border);">
+  <div class="ml-row" style="justify-content:space-between;">
+    <span class="t-eyebrow" style="flex-shrink:0;margin-right:40px;">Students admitted to</span>
+    <div class="ml-row" style="gap:48px;opacity:.7;flex-wrap:wrap;">
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">Cambridge</span>
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">IDP IELTS</span>
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">British Council</span>
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">University of Toronto</span>
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">NYU</span>
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">Imperial College</span>
+      <span style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;color:var(--ink-2);">UCL</span>
+    </div>
+  </div>
+</div>
+
+<!-- BAND PREVIEW -->
+<section style="padding:120px 60px 0;">
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <span class="t-eyebrow">Four skills</span>
+    <h2 class="h-display" style="font-size:clamp(36px,5vw,56px);max-width:880px;letter-spacing:-0.025em;">One platform, mocked end-to-end with the <em>same conditions</em> as test day.</h2>
+    <p class="t-lead" style="margin:0;max-width:640px;font-size:17px;">Every question type, every timing, every transition. We mirror the official format down to the audio gaps.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:56px;">
+    {% for card in skill_cards %}
+    <div class="ml-card-2" style="padding:24px;display:flex;flex-direction:column;gap:16px;min-height:320px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;background:{{ card.color }};opacity:.06;"></div>
+      <div class="ml-row" style="justify-content:space-between;">
+        <div style="width:40px;height:40px;border-radius:12px;background:{{ card.color }};color:#fff;display:flex;align-items:center;justify-content:center;">{{ card.icon|safe }}</div>
+        <span style="font-family:'Newsreader',serif;font-weight:600;font-size:26px;color:{{ card.color }};">{{ card.band }}</span>
+      </div>
+      <div>
+        <div style="font-family:'Newsreader',serif;font-size:24px;font-weight:500;letter-spacing:-0.01em;">{{ card.name }}</div>
+        <div class="t-meta" style="margin-top:2px;">{{ card.subtitle }}</div>
+      </div>
+      <div style="padding:12px;background:var(--surface-2);border-radius:8px;font-family:'Newsreader',serif;font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.4;margin-top:auto;">{{ card.excerpt }}</div>
+      <div class="ml-row" style="justify-content:space-between;align-items:center;padding-top:8px;">
+        <span class="t-meta" style="font-size:11px;">{{ card.label }}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+    {% empty %}
+    <!-- Listening -->
+    <div class="ml-card-2" style="padding:24px;display:flex;flex-direction:column;gap:16px;min-height:320px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;background:#1F3A68;opacity:.06;"></div>
+      <div class="ml-row" style="justify-content:space-between;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#1F3A68;color:#fff;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/></svg></div>
+        <span style="font-family:'Newsreader',serif;font-weight:600;font-size:26px;color:#1F3A68;">8.0</span>
+      </div>
+      <div><div style="font-family:'Newsreader',serif;font-size:24px;font-weight:500;">Listening</div><div class="t-meta" style="margin-top:2px;">180 mocks · 30 min audio</div></div>
+      <div style="padding:12px;background:var(--surface-2);border-radius:8px;font-family:'Newsreader',serif;font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.4;margin-top:auto;">Section 1 · A conversation in an everyday social context.</div>
+      <div class="ml-row" style="justify-content:space-between;align-items:center;padding-top:8px;"><span class="t-meta" style="font-size:11px;">Band 8 · Very good user</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+    <!-- Reading -->
+    <div class="ml-card-2" style="padding:24px;display:flex;flex-direction:column;gap:16px;min-height:320px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;background:#7E4EC0;opacity:.06;"></div>
+      <div class="ml-row" style="justify-content:space-between;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#7E4EC0;color:#fff;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v16H4z"/><path d="M11 4h9v16h-9"/><path d="M11 4v16"/></svg></div>
+        <span style="font-family:'Newsreader',serif;font-weight:600;font-size:26px;color:#7E4EC0;">7.5</span>
+      </div>
+      <div><div style="font-family:'Newsreader',serif;font-size:24px;font-weight:500;">Reading</div><div class="t-meta" style="margin-top:2px;">40 questions · 60 min</div></div>
+      <div style="padding:12px;background:var(--surface-2);border-radius:8px;font-family:'Newsreader',serif;font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.4;margin-top:auto;">Passage 2 · The migration patterns of monarch butterflies.</div>
+      <div class="ml-row" style="justify-content:space-between;align-items:center;padding-top:8px;"><span class="t-meta" style="font-size:11px;">Band 7.5 · Good user</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+    <!-- Writing -->
+    <div class="ml-card-2" style="padding:24px;display:flex;flex-direction:column;gap:16px;min-height:320px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;background:#C03E5C;opacity:.06;"></div>
+      <div class="ml-row" style="justify-content:space-between;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#C03E5C;color:#fff;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11.5-11.5a2 2 0 0 0-2.8-2.8L5 16l-1 4z"/></svg></div>
+        <span style="font-family:'Newsreader',serif;font-weight:600;font-size:26px;color:#C03E5C;">7.0</span>
+      </div>
+      <div><div style="font-family:'Newsreader',serif;font-size:24px;font-weight:500;">Writing</div><div class="t-meta" style="margin-top:2px;">2 tasks · 60 min · AI graded</div></div>
+      <div style="padding:12px;background:var(--surface-2);border-radius:8px;font-family:'Newsreader',serif;font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.4;margin-top:auto;">Task 2 · Discuss both views and give your own opinion.</div>
+      <div class="ml-row" style="justify-content:space-between;align-items:center;padding-top:8px;"><span class="t-meta" style="font-size:11px;">Band 7 · Good user</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+    <!-- Speaking -->
+    <div class="ml-card-2" style="padding:24px;display:flex;flex-direction:column;gap:16px;min-height:320px;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;background:#0E9488;opacity:.06;"></div>
+      <div class="ml-row" style="justify-content:space-between;">
+        <div style="width:40px;height:40px;border-radius:12px;background:#0E9488;color:#fff;display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+        <span style="font-family:'Newsreader',serif;font-weight:600;font-size:26px;color:#0E9488;">7.5</span>
+      </div>
+      <div><div style="font-family:'Newsreader',serif;font-size:24px;font-weight:500;">Speaking</div><div class="t-meta" style="margin-top:2px;">3 parts · 11–14 min · AI examiner</div></div>
+      <div style="padding:12px;background:var(--surface-2);border-radius:8px;font-family:'Newsreader',serif;font-size:13px;font-style:italic;color:var(--ink-2);line-height:1.4;margin-top:auto;">Part 2 · Describe a place you would like to visit.</div>
+      <div class="ml-row" style="justify-content:space-between;align-items:center;padding-top:8px;"><span class="t-meta" style="font-size:11px;">Band 7.5 · Good user</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- EXAM PREVIEW -->
+<section style="padding:120px 60px 0;">
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <span class="t-eyebrow">The experience</span>
+    <h2 class="h-display" style="font-size:clamp(36px,5vw,56px);max-width:880px;letter-spacing:-0.025em;">See your mock test before you start.</h2>
+    <p class="t-lead" style="margin:0;max-width:640px;font-size:17px;">Authentic exam chrome — no flashy UI tricks, no surprises on test day.</p>
+  </div>
+
+  <div class="ml-row" style="gap:8px;margin-top:32px;padding:5px;background:var(--inset);border-radius:99px;width:fit-content;">
+    <button class="ml-btn ml-btn-sm tab-btn active" onclick="switchTab(this,'reading')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v16H4z"/><path d="M11 4h9v16h-9"/><path d="M11 4v16"/></svg> Reading</button>
+    <button class="ml-btn ml-btn-sm tab-btn" onclick="switchTab(this,'listening')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/></svg> Listening</button>
+    <button class="ml-btn ml-btn-sm tab-btn" onclick="switchTab(this,'writing')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11.5-11.5a2 2 0 0 0-2.8-2.8L5 16l-1 4z"/></svg> Writing</button>
+    <button class="ml-btn ml-btn-sm tab-btn" onclick="switchTab(this,'speaking')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> Speaking</button>
+  </div>
+
+  <div class="ml-card-2" style="margin-top:28px;padding:0;height:560px;overflow:hidden;background:var(--surface-2);border-radius:24px;position:relative;">
+    <div class="ml-row" style="height:36px;padding:0 16px;background:var(--inset);border-bottom:.5px solid var(--border);gap:6px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--border-strong);"></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--border-strong);"></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--border-strong);"></div>
+      <div id="urlbar" style="flex:1;height:22px;margin:0 16px;background:var(--surface);border-radius:6px;display:flex;align-items:center;padding:0 10px;font-family:'Geist Mono',monospace;font-size:10px;color:var(--muted);">mockleap.io/mock/reading/test-14</div>
+      <span class="t-meta" style="font-size:10px;">00:42:18 remaining</span>
+    </div>
+
+    <!-- Reading tab -->
+    <div id="tab-reading" class="tab-content-block active" style="display:grid;grid-template-columns:1fr 1fr;height:524px;">
+      <div style="padding:28px;border-right:.5px solid var(--border);overflow:hidden;">
+        <div class="t-eyebrow">Passage 2 · 12 of 13 paragraphs</div>
+        <h3 class="h-display" style="font-size:24px;margin-top:8px;margin-bottom:16px;">The migration of the monarch butterfly</h3>
+        <p class="t-body" style="font-size:14px;margin-bottom:16px;">Each autumn, millions of monarch butterflies (<i>Danaus plexippus</i>) leave the cool latitudes of southern Canada and the northern United States, beginning a <span class="ml-hl-yellow">3,400-kilometre migration</span> south to a few isolated valleys in the mountains of central Mexico.</p>
+        <p class="t-body" style="font-size:14px;">Researchers have proposed that <span class="ml-hl-pink">a combination of solar cues and an internal time-compensated sun compass</span> guides the butterflies…</p>
+      </div>
+      <div style="padding:28px;overflow:hidden;">
+        <div class="t-eyebrow">Questions 14–17</div>
+        <div style="margin-top:4px;font-family:'Newsreader',serif;font-size:15px;font-style:italic;color:var(--ink);">Choose the correct letter, A, B, C or D.</div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:12px;">
+            <span class="ml-num ml-num-active">14</span>
+            <div style="flex:1;">
+              <div class="t-body" style="margin-bottom:8px;font-size:13px;">The author finds the monarch migration most striking because</div>
+              <div class="ml-row" style="gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;"><span class="ml-radio"></span><span class="t-body" style="font-size:13px;"><b>A</b>&nbsp; the distance covered is unprecedented.</span></div>
+              <div class="ml-row" style="gap:10px;padding:8px 10px;border-radius:8px;background:var(--accent-soft);cursor:pointer;margin-bottom:2px;"><span class="ml-radio ml-radio-on"></span><span class="t-body" style="font-size:13px;"><b>B</b>&nbsp; no single butterfly experiences the full route.</span></div>
+              <div class="ml-row" style="gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;"><span class="ml-radio"></span><span class="t-body" style="font-size:13px;"><b>C</b>&nbsp; the destination valleys are isolated.</span></div>
+              <div class="ml-row" style="gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;"><span class="ml-radio"></span><span class="t-body" style="font-size:13px;"><b>D</b>&nbsp; it occurs every autumn.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listening tab -->
+    <div id="tab-listening" class="tab-content-block" style="display:none;padding:36px;height:524px;flex-direction:column;gap:24px;">
+      <div><div class="t-eyebrow">Section 3 · Question 24</div><h3 class="h-display" style="font-size:22px;margin-top:6px;">Two students discuss their research project.</h3></div>
+      <div class="ml-card" style="padding:20px;background:var(--ink);color:var(--bg-2);border-color:transparent;">
+        <div class="ml-row" style="gap:16px;">
+          <button style="width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--on-accent);border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>
+          <div style="flex:1;">
+            <div class="ml-row" style="justify-content:space-between;margin-bottom:8px;"><span class="t-meta" style="color:rgba(242,232,208,0.7);">Audio plays once · no rewind</span><span class="tnum" style="font-family:'Geist Mono',monospace;font-size:13px;">04:23 / 09:48</span></div>
+            <svg id="listenWave" width="100%" height="36" viewBox="0 0 600 36" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;padding:16px;background:var(--surface);border:.5px solid var(--border);border-radius:12px;">
+        <span class="ml-num ml-num-active">24</span>
+        <div style="flex:1;"><div class="t-body" style="margin-bottom:10px;">The students will focus their project on <span style="display:inline-block;min-width:160px;border-bottom:1.5px solid var(--ink);padding:0 8px;color:var(--ink);font-weight:500;">renewable…</span> sources.</div><div class="t-meta" style="font-size:11px;font-style:italic;">Write ONE WORD ONLY.</div></div>
+      </div>
+    </div>
+
+    <!-- Writing tab -->
+    <div id="tab-writing" class="tab-content-block" style="display:none;grid-template-columns:1fr 1fr;height:524px;">
+      <div style="padding:28px;border-right:.5px solid var(--border);">
+        <div class="t-eyebrow">Task 2 · 250 words minimum</div>
+        <h3 class="h-display" style="font-size:19px;margin-top:6px;line-height:1.35;">Some people believe universities should focus on academic subjects only. Others say practical skills are equally important. Discuss both views.</h3>
+        <div style="margin-top:18px;padding:16px;background:var(--surface-2);border-radius:10px;height:280px;font-family:'Newsreader',serif;font-size:14px;line-height:1.6;color:var(--ink-2);overflow:hidden;">
+          <p>The debate over the proper scope of higher education has intensified in recent years. In my view, the two are <span style="background:#FCE5AA;padding:0 2px;border-radius:2px;">complementary rather than mutually exclusive</span>…<span style="display:inline-block;width:2px;height:18px;background:var(--accent-2);vertical-align:text-bottom;margin-left:1px;animation:blink 1s steps(2) infinite;"></span></p>
+        </div>
+        <div class="ml-row" style="justify-content:space-between;margin-top:12px;"><span class="t-meta">Word count: <b class="tnum" style="color:var(--ok);">284</b> / 250</span><span class="tnum" style="font-family:'Geist Mono',monospace;font-size:13px;">32:11 left</span></div>
+      </div>
+      <div style="padding:28px;background:var(--surface-2);">
+        <div class="ml-row" style="gap:8px;margin-bottom:14px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent-2);"><path d="M12 3l1.6 4.4 4.4 1.6-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zM19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg><span class="t-eyebrow">Live AI feedback</span><span class="ml-chip ml-chip-ok" style="margin-left:auto;height:20px;font-size:10px;">Auto · 4 min ago</span></div>
+        <div class="ml-card" style="padding:14px;margin-bottom:10px;"><div class="ml-row" style="justify-content:space-between;"><span style="font-size:13px;font-weight:500;color:var(--ink-2);">Provisional band</span><span style="font-family:'Newsreader',serif;font-size:22px;font-weight:600;">7.0</span></div><div style="height:6px;background:var(--inset);border-radius:99px;overflow:hidden;margin-top:8px;"><div style="height:100%;width:77.8%;background:var(--accent);border-radius:99px;"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="ml-card" style="padding:10px 12px;display:flex;gap:10px;align-items:flex-start;"><span class="ml-chip ml-chip-ok" style="height:18px;font-size:9.5px;">Grammar</span><span class="t-body" style="font-size:12px;flex:1;">Strong parallel structure — "rather than mutually exclusive" well formed.</span></div>
+          <div class="ml-card" style="padding:10px 12px;display:flex;gap:10px;align-items:flex-start;"><span class="ml-chip" style="height:18px;font-size:9.5px;background:var(--warn-soft);color:var(--warn);border-color:transparent;">Lexical</span><span class="t-body" style="font-size:12px;flex:1;">Try "complementary" → "synergistic" for higher lexical resource.</span></div>
+          <div class="ml-card" style="padding:10px 12px;display:flex;gap:10px;align-items:flex-start;"><span class="ml-chip" style="height:18px;font-size:9.5px;background:var(--warn-soft);color:var(--warn);border-color:transparent;">Cohesion</span><span class="t-body" style="font-size:12px;flex:1;">Paragraph 2 missing topic sentence.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Speaking tab -->
+    <div id="tab-speaking" class="tab-content-block" style="display:none;padding:36px;height:524px;grid-template-columns:1fr 320px;gap:28px;">
+      <div>
+        <div class="t-eyebrow">Part 2 · 1-minute prep · 2-minute speech</div>
+        <h3 class="h-display" style="font-size:24px;margin-top:6px;max-width:520px;line-height:1.3;">Describe a place you would like to visit.</h3>
+        <div style="margin-top:14px;padding:16px;background:var(--surface-2);border-radius:12px;font-size:13px;color:var(--ink-2);">You should say: <ul style="margin:6px 0 0;padding:0 0 0 18px;line-height:1.8;"><li>where it is</li><li>how you would get there</li><li>what you would do there</li></ul> and explain why you would like to visit this place.</div>
+        <div class="ml-row" style="margin-top:24px;gap:20px;">
+          <button style="width:76px;height:76px;border-radius:50%;background:var(--rose);color:#fff;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 0 0 6px rgba(192,62,92,0.18),0 0 0 12px rgba(192,62,92,0.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+          <div><div class="t-eyebrow" style="color:var(--rose);">● Recording</div><div style="font-family:'Geist Mono',monospace;font-size:24px;font-weight:500;margin-top:4px;" class="tnum">01:24</div><div class="t-meta" style="margin-top:4px;">36 seconds remaining</div></div>
+          <svg id="speakWave2" width="200" height="76" viewBox="0 0 200 76"></svg>
+        </div>
+      </div>
+      <div class="ml-card" style="padding:20px;background:var(--ink);color:var(--bg-2);border-color:transparent;height:fit-content;">
+        <div class="ml-row" style="gap:10px;margin-bottom:12px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:#1F3A68;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;">IB</div>
+          <div><div style="font-family:'Newsreader',serif;font-size:15px;">Iris</div><div class="t-meta" style="font-size:11px;color:rgba(242,232,208,0.55);">AI Examiner · British accent</div></div>
+        </div>
+        <p style="margin:0;font-family:'Newsreader',serif;font-size:14px;font-style:italic;line-height:1.5;color:rgba(242,232,208,0.85);">"Now, I'd like you to describe a place you would like to visit. You'll have one minute to prepare…"</p>
+        <div style="height:.5px;background:rgba(242,232,208,0.15);margin:14px 0;"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="ml-row" style="justify-content:space-between;"><span style="font-size:11px;color:rgba(242,232,208,0.7);">Fluency</span><span style="font-family:'Newsreader',serif;font-size:14px;color:var(--accent);">7.5</span></div>
+          <div class="ml-row" style="justify-content:space-between;"><span style="font-size:11px;color:rgba(242,232,208,0.7);">Lexical</span><span style="font-family:'Newsreader',serif;font-size:14px;color:var(--accent);">7.0</span></div>
+          <div class="ml-row" style="justify-content:space-between;"><span style="font-size:11px;color:rgba(242,232,208,0.7);">Grammar</span><span style="font-family:'Newsreader',serif;font-size:14px;color:var(--accent);">7.5</span></div>
+          <div class="ml-row" style="justify-content:space-between;"><span style="font-size:11px;color:rgba(242,232,208,0.7);">Pronunciation</span><span style="font-family:'Newsreader',serif;font-size:14px;color:var(--accent);">8.0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding:120px 60px 0;">
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <span class="t-eyebrow">Built for real preparation</span>
+    <h2 class="h-display" style="font-size:clamp(36px,5vw,56px);max-width:880px;letter-spacing:-0.025em;">Not another flashcard app.</h2>
+    <p class="t-lead" style="margin:0;max-width:640px;font-size:17px;">MockLeap is the practice loop you need to leave with a Band 7+ — accurate, accountable, free.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:56px;">
+    <div class="ml-card-2" style="padding:32px;display:flex;gap:20px;">
+      <div style="width:48px;height:48px;border-radius:14px;flex-shrink:0;background:var(--inset);color:var(--ink);display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.6 4.4 4.4 1.6-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zM19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg></div>
+      <div style="flex:1;"><span class="t-eyebrow">AI Examiner</span><h3 class="h-display" style="font-size:24px;margin:8px 0 12px;letter-spacing:-0.015em;line-height:1.25;">Speaking &amp; Writing graded against the real descriptors.</h3><p class="t-body" style="margin:0;">Trained on thousands of Band 5–9 responses, calibrated by certified IELTS trainers. You get a band, paragraph-by-paragraph notes, and concrete rewrites.</p></div>
+    </div>
+    <div class="ml-card-2" style="padding:32px;display:flex;gap:20px;">
+      <div style="width:48px;height:48px;border-radius:14px;flex-shrink:0;background:var(--inset);color:var(--ink);display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></div>
+      <div style="flex:1;"><span class="t-eyebrow">Same Conditions</span><h3 class="h-display" style="font-size:24px;margin:8px 0 12px;letter-spacing:-0.015em;line-height:1.25;">Authentic exam chrome, timing, and audio behaviour.</h3><p class="t-body" style="margin:0;">Listening plays exactly once. Reading is split-pane. Writing has no spell-check. Speaking matches the 11–14 minute structure.</p></div>
+    </div>
+    <div class="ml-card-2" style="padding:32px;display:flex;gap:20px;">
+      <div style="width:48px;height:48px;border-radius:14px;flex-shrink:0;background:var(--inset);color:var(--ink);display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="M8 14l3-4 3 3 5-7"/></svg></div>
+      <div style="flex:1;"><span class="t-eyebrow">Progress Tracking</span><h3 class="h-display" style="font-size:24px;margin:8px 0 12px;letter-spacing:-0.015em;line-height:1.25;">See your weak spots before your test date.</h3><p class="t-body" style="margin:0;">Per-question type accuracy, vocabulary diversity over time. Your dashboard knows what to drill.</p></div>
+    </div>
+    <div class="ml-card-2" style="padding:32px;display:flex;gap:20px;">
+      <div style="width:48px;height:48px;border-radius:14px;flex-shrink:0;background:var(--inset);color:var(--ink);display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s4 4 4 8a4 4 0 1 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7z"/></svg></div>
+      <div style="flex:1;"><span class="t-eyebrow">Daily Practice</span><h3 class="h-display" style="font-size:24px;margin:8px 0 12px;letter-spacing:-0.015em;line-height:1.25;">Twenty minutes a day, no decision fatigue.</h3><p class="t-body" style="margin:0;">A curated micro-mock every morning — one passage, one listening section, one writing paragraph, one Part-1 speaking volley.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section style="padding:120px 0 0;background:var(--ink);color:var(--bg-2);margin-top:120px;">
+  <div style="padding:88px 60px;text-align:center;">
+    <span class="t-eyebrow" style="color:var(--accent);">By the numbers</span>
+    <h2 class="h-display" style="font-size:clamp(36px,6vw,64px);margin:14px auto 0;color:var(--bg-2);max-width:880px;">A practice habit that <em style="color:var(--accent);">actually moves the needle</em>.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:.5px solid rgba(242,232,208,0.12);">
+    <div style="padding:36px;border-right:.5px solid rgba(242,232,208,0.12);display:flex;flex-direction:column;gap:8px;"><div style="font-family:'Newsreader',serif;font-size:56px;font-weight:600;line-height:1;color:var(--accent);letter-spacing:-0.02em;">312,604</div><div style="font-size:15px;color:var(--bg-2);">Students preparing this month</div><div class="t-meta" style="color:rgba(242,232,208,0.5);">+18% vs. October</div></div>
+    <div style="padding:36px;border-right:.5px solid rgba(242,232,208,0.12);display:flex;flex-direction:column;gap:8px;"><div style="font-family:'Newsreader',serif;font-size:56px;font-weight:600;line-height:1;color:var(--accent);letter-spacing:-0.02em;">2.4M</div><div style="font-size:15px;color:var(--bg-2);">Mock tests completed</div><div class="t-meta" style="color:rgba(242,232,208,0.5);">Across all four skills</div></div>
+    <div style="padding:36px;border-right:.5px solid rgba(242,232,208,0.12);display:flex;flex-direction:column;gap:8px;"><div style="font-family:'Newsreader',serif;font-size:56px;font-weight:600;line-height:1;color:var(--accent);letter-spacing:-0.02em;">6.8→7.6</div><div style="font-size:15px;color:var(--bg-2);">Average band improvement</div><div class="t-meta" style="color:rgba(242,232,208,0.5);">After 6 weeks of practice</div></div>
+    <div style="padding:36px;display:flex;flex-direction:column;gap:8px;"><div style="font-family:'Newsreader',serif;font-size:56px;font-weight:600;line-height:1;color:var(--accent);letter-spacing:-0.02em;">92%</div><div style="font-size:15px;color:var(--bg-2);">Hit their target band</div><div class="t-meta" style="color:rgba(242,232,208,0.5);">Within first attempt</div></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="padding:120px 60px 0;">
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <span class="t-eyebrow">What students say</span>
+    <h2 class="h-display" style="font-size:clamp(36px,5vw,56px);max-width:880px;letter-spacing:-0.025em;">From <em>"is this real?"</em> to <em>"that was easier than the mock."</em></h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px;">
+    <div class="ml-card-2" style="padding:28px;display:flex;flex-direction:column;gap:20px;min-height:380px;">
+      <div style="display:flex;gap:1px;">{% for i in "12345" %}<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" stroke="none"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.8l-5.4 2.7 1.2-6L3.3 9.3l6.1-.7L12 3z"/></svg>{% endfor %}</div>
+      <p class="h-serif" style="margin:0;font-size:19px;line-height:1.45;color:var(--ink);">"I took six full mocks here in four weeks. The Reading time-pressure was honestly more brutal than the real test — that was the point."</p>
+      <div class="ml-row" style="gap:12px;margin-top:auto;"><div style="width:44px;height:44px;border-radius:50%;background:#1F3A68;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;">AS</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Aigerim S.</div><div class="t-meta">Almaty, Kazakhstan</div></div><div style="text-align:right;"><div class="t-meta" style="font-size:10px;">Target: 7.5</div><div style="font-family:'Newsreader',serif;font-size:14px;font-weight:600;color:var(--ok);">Achieved: 8.0</div></div></div>
+    </div>
+    <div class="ml-card-2" style="padding:28px;display:flex;flex-direction:column;gap:20px;min-height:380px;">
+      <div style="display:flex;gap:1px;">{% for i in "12345" %}<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" stroke="none"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.8l-5.4 2.7 1.2-6L3.3 9.3l6.1-.7L12 3z"/></svg>{% endfor %}</div>
+      <p class="h-serif" style="margin:0;font-size:19px;line-height:1.45;color:var(--ink);">"The AI Writing feedback caught patterns my tutor missed — every essay I was overusing &ldquo;moreover.&rdquo; Two weeks later my coherence score jumped from 6 to 7."</p>
+      <div class="ml-row" style="gap:12px;margin-top:auto;"><div style="width:44px;height:44px;border-radius:50%;background:#7E4EC0;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;">DA</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Daniyar A.</div><div class="t-meta">Tashkent, Uzbekistan</div></div><div style="text-align:right;"><div class="t-meta" style="font-size:10px;">Target: 7.0</div><div style="font-family:'Newsreader',serif;font-size:14px;font-weight:600;color:var(--ok);">Achieved: 7.5</div></div></div>
+    </div>
+    <div class="ml-card-2" style="padding:28px;display:flex;flex-direction:column;gap:20px;min-height:380px;">
+      <div style="display:flex;gap:1px;">{% for i in "12345" %}<svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" stroke="none"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.8l-5.4 2.7 1.2-6L3.3 9.3l6.1-.7L12 3z"/></svg>{% endfor %}</div>
+      <p class="h-serif" style="margin:0;font-size:19px;line-height:1.45;color:var(--ink);">"MockLeap is the only one where I closed the tab and thought &lsquo;ok that was actually it.&rsquo;"</p>
+      <div class="ml-row" style="gap:12px;margin-top:auto;"><div style="width:44px;height:44px;border-radius:50%;background:#0E9488;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;flex-shrink:0;">ML</div><div style="flex:1;"><div style="font-weight:600;font-size:14px;">Mei L.</div><div class="t-meta">Beijing, China</div></div><div style="text-align:right;"><div class="t-meta" style="font-size:10px;">Target: 6.5</div><div style="font-family:'Newsreader',serif;font-size:14px;font-weight:600;color:var(--ok);">Achieved: 7.0</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding:120px 60px 0;">
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:80px;align-items:start;">
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <span class="t-eyebrow">Common questions</span>
+      <h2 class="h-display" style="font-size:clamp(36px,5vw,56px);letter-spacing:-0.025em;">You probably want to know…</h2>
+      <p class="t-lead" style="margin:0;font-size:17px;">Can't find what you're looking for? Drop us a note.</p>
+    </div>
+    <div style="border-top:.5px solid var(--border);">
+      {% for faq in faqs %}
+      <div class="faq-item" style="border-bottom:.5px solid var(--border);padding:20px 0;cursor:pointer;" onclick="toggleFaq(this)">
+        <div class="ml-row" style="justify-content:space-between;">
+          <span class="h-serif" style="font-size:20px;font-weight:500;color:var(--ink);">{{ faq.q }}</span>
+          <span style="color:var(--muted);flex-shrink:0;margin-left:16px;">
+            <svg class="icon-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            <svg class="icon-minus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+          </span>
+        </div>
+        <p class="faq-answer t-body" style="margin:12px 80px 4px 0;font-size:15px;">{{ faq.a }}</p>
+      </div>
+      {% empty %}
+      <div class="faq-item" style="border-bottom:.5px solid var(--border);padding:20px 0;cursor:pointer;" onclick="toggleFaq(this)">
+        <div class="ml-row" style="justify-content:space-between;"><span class="h-serif" style="font-size:20px;font-weight:500;color:var(--ink);">Is MockLeap really free?</span><span style="color:var(--muted);flex-shrink:0;margin-left:16px;"><svg class="icon-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><svg class="icon-minus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></span></div>
+        <p class="faq-answer t-body" style="margin:12px 80px 4px 0;font-size:15px;">Yes. Every mock test, every AI feedback report, every band estimation — free.</p>
+      </div>
+      <div class="faq-item" style="border-bottom:.5px solid var(--border);padding:20px 0;cursor:pointer;" onclick="toggleFaq(this)">
+        <div class="ml-row" style="justify-content:space-between;"><span class="h-serif" style="font-size:20px;font-weight:500;color:var(--ink);">How accurate is the AI band estimation?</span><span style="color:var(--muted);flex-shrink:0;margin-left:16px;"><svg class="icon-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><svg class="icon-minus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></span></div>
+        <p class="faq-answer t-body" style="margin:12px 80px 4px 0;font-size:15px;">Within ±0.5 bands of human IELTS examiner scoring on our blind-test set of 8,000 essays.</p>
+      </div>
+      <div class="faq-item" style="border-bottom:.5px solid var(--border);padding:20px 0;cursor:pointer;" onclick="toggleFaq(this)">
+        <div class="ml-row" style="justify-content:space-between;"><span class="h-serif" style="font-size:20px;font-weight:500;color:var(--ink);">Can I practice for Academic and General Training?</span><span style="color:var(--muted);flex-shrink:0;margin-left:16px;"><svg class="icon-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><svg class="icon-minus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></span></div>
+        <p class="faq-answer t-body" style="margin:12px 80px 4px 0;font-size:15px;">Both are fully supported. Pick your test type when you start a mock.</p>
+      </div>
+      <div class="faq-item" style="border-bottom:.5px solid var(--border);padding:20px 0;cursor:pointer;" onclick="toggleFaq(this)">
+        <div class="ml-row" style="justify-content:space-between;"><span class="h-serif" style="font-size:20px;font-weight:500;color:var(--ink);">What if I don't have a microphone for Speaking?</span><span style="color:var(--muted);flex-shrink:0;margin-left:16px;"><svg class="icon-plus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><svg class="icon-minus" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></span></div>
+        <p class="faq-answer t-body" style="margin:12px 80px 4px 0;font-size:15px;">Reading, Listening, and Writing all work without a mic. Speaking requires one — we do a 60-second mic check before each session.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="padding:120px 60px 80px;">
+  <div class="ml-card-2" style="padding:80px;text-align:center;border-radius:28px;background:linear-gradient(135deg,var(--surface) 0%,var(--accent-soft) 100%);position:relative;overflow:hidden;">
+    <div style="position:absolute;top:-100px;right:-100px;width:300px;height:300px;border-radius:50%;background:var(--accent);opacity:.2;pointer-events:none;"></div>
+    <span class="t-eyebrow">Start today</span>
+    <h2 class="h-display" style="font-size:clamp(40px,6vw,72px);margin:14px auto 24px;max-width:780px;">Your test date is closer than you think.</h2>
+    <p class="t-lead" style="max-width:540px;margin:0 auto 36px;font-size:18px;">Take one full-length mock right now. Get your band estimation in under a minute.</p>
+    <div class="ml-row" style="gap:12px;justify-content:center;">
+      <a href="{% url 'account_signup' %}" class="ml-btn ml-btn-primary ml-btn-lg">
+        Start Mock Test
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="{% url 'reading:list' %}" class="ml-btn ml-btn-ghost ml-btn-lg">Sample test (10 min)</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="padding:80px 60px 32px;border-top:.5px solid var(--border);">
+  <div style="display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:48px;">
+    <div>
+      <a href="/" class="ml-mark" style="text-decoration:none;"><span class="ml-mark-dot" style="width:8px;height:8px;"></span><span>MockLeap</span></a>
+      <p class="t-body" style="margin-top:16px;font-size:13px;max-width:260px;">Free, accurate IELTS mock tests for students preparing for university, immigration, and the next chapter.</p>
+    </div>
+    <div>
+      <div class="t-eyebrow" style="margin-bottom:14px;">Tests</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+        <li><a href="{% url 'reading:list' %}" class="t-body" style="font-size:13px;">Academic</a></li>
+        <li><a href="{% url 'listening:list' %}" class="t-body" style="font-size:13px;">Listening</a></li>
+        <li><a href="{% url 'writing:list' %}" class="t-body" style="font-size:13px;">Writing</a></li>
+        <li><a href="{% url 'speaking:list' %}" class="t-body" style="font-size:13px;">Speaking</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="t-eyebrow" style="margin-bottom:14px;">Skills</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+        <li><a href="{% url 'reading:list' %}" class="t-body" style="font-size:13px;">Reading</a></li>
+        <li><a href="{% url 'listening:list' %}" class="t-body" style="font-size:13px;">Listening</a></li>
+        <li><a href="{% url 'writing:list' %}" class="t-body" style="font-size:13px;">Writing</a></li>
+        <li><a href="{% url 'speaking:list' %}" class="t-body" style="font-size:13px;">Speaking</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="t-eyebrow" style="margin-bottom:14px;">Community</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+        <li><a href="{% url 'community:rooms' %}" class="t-body" style="font-size:13px;">Forums</a></li>
+        <li><a href="{% url 'rankings:leaderboard' %}" class="t-body" style="font-size:13px;">Leaderboard</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="t-eyebrow" style="margin-bottom:14px;">Company</div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
+        <li><a href="{% url 'core:about' %}" class="t-body" style="font-size:13px;">About</a></li>
+        <li><a href="{% url 'core:faq' %}" class="t-body" style="font-size:13px;">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ml-row" style="justify-content:space-between;margin-top:64px;padding-top:24px;border-top:.5px solid var(--border);">
+    <span class="t-meta">© {% now "Y" %} MockLeap. Not affiliated with the IELTS Partners.</span>
+    <div class="ml-row" style="gap:16px;">
+      <a class="t-meta" href="#">Privacy</a>
+      <a class="t-meta" href="#">Terms</a>
+      <a class="t-meta" href="#">Accessibility</a>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  function drawWave(svgId,count,width,height,activeCount,activeColor,inactiveColor,barW,gap){
+    const svg=document.getElementById(svgId);if(!svg)return;
+    let html='';const total=count*(barW+gap)-gap;const scale=width/total;
+    for(let i=0;i<count;i++){const seed=Math.sin(i*.7)*Math.cos(i*.3);const h=6+Math.abs(seed)*(height*.85-6);const x=i*(barW+gap)*scale;const y=(height-h)/2;const fill=i<activeCount?activeColor:inactiveColor;html+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(barW*scale).toFixed(1)}" height="${h.toFixed(1)}" rx="1.2" fill="${fill}"/>`;}
+    svg.innerHTML=html;
+  }
+  drawWave('speakWave',44,172,36,22,'var(--ink)','var(--border-2)',2.4,1.5);
+  drawWave('speakWave2',40,200,76,20,'var(--rose)','rgba(192,62,92,0.2)',3.5,2);
+  drawWave('listenWave',120,600,36,54,'var(--accent)','rgba(242,232,208,0.25)',3,2);
+})();
+
+const _tabIds=['reading','listening','writing','speaking'];
+const _urlLabels={reading:'mockleap.io/mock/reading/test-14',listening:'mockleap.io/mock/listening/test-14',writing:'mockleap.io/mock/writing/test-14',speaking:'mockleap.io/mock/speaking/test-14'};
+
+function switchTab(btn,tabId){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  _tabIds.forEach(id=>{const el=document.getElementById('tab-'+id);if(el)el.style.display='none';});
+  const active=document.getElementById('tab-'+tabId);
+  if(active){
+    if(tabId==='speaking')active.style.display='grid';
+    else if(tabId==='listening'){active.style.display='flex';active.style.flexDirection='column';}
+    else if(tabId==='writing')active.style.display='grid';
+    else active.style.display='grid';
+  }
+  const urlbar=document.getElementById('urlbar');
+  if(urlbar)urlbar.textContent=_urlLabels[tabId];
+}
+
+function toggleFaq(item){
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+</script>
+{% endblock %}

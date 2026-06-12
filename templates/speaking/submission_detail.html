@@ -1,0 +1,20 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Speaking Submission{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <a href="{% url 'speaking:list' %}" class="ml-btn ml-btn-ghost ml-btn-sm">← Back</a>
+    <div><h1 class="h-display" style="font-size:24px;">Speaking · {{ submission.part.get_part_type_display }}</h1><p class="t-meta">{{ submission.submitted_at|date:"M j, Y" }}</p></div>
+    <span class="ml-chip {% if submission.overall_band %}ml-chip-ok{% else %}ml-chip-accent{% endif %} ml-auto">{% if submission.overall_band %}Reviewed{% else %}Pending{% endif %}</span>
+  </div>
+  {% if submission.audio_file %}<div class="ml-card p-5 mb-6"><audio controls class="w-full" src="{{ submission.audio_file.url }}"></audio></div>{% endif %}
+  {% if submission.overall_band %}
+  <div class="ml-card-2 p-6"><div class="t-eyebrow mb-3">Band scores</div><div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {% if submission.band_fluency %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_fluency }}</div><div class="t-meta text-xs mt-1">Fluency</div></div>{% endif %}
+    {% if submission.band_lexical %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_lexical }}</div><div class="t-meta text-xs mt-1">Lexical</div></div>{% endif %}
+    {% if submission.band_grammar %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_grammar }}</div><div class="t-meta text-xs mt-1">Grammar</div></div>{% endif %}
+    {% if submission.band_pronunciation %}<div class="text-center"><div class="tnum text-2xl font-semibold" style="color:var(--ink);">{{ submission.band_pronunciation }}</div><div class="t-meta text-xs mt-1">Pronunciation</div></div>{% endif %}
+  </div>{% if submission.teacher_comment %}<div class="mt-4 pt-4 border-t" style="border-color:var(--border);"><div class="t-eyebrow mb-2">Feedback</div><p class="t-body">{{ submission.teacher_comment }}</p></div>{% endif %}</div>
+  {% else %}<div class="ml-card p-6 text-center"><p class="t-body">Your submission is being reviewed by a teacher.</p></div>{% endif %}
+</div>
+{% endblock %}

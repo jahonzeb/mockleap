@@ -1,0 +1,38 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Speaking Tests{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="h-display" style="font-size:28px;">Speaking</h1>
+    <p class="t-meta mt-1">11–14 minutes · 3 parts · Teacher graded</p>
+  </div>
+</div>
+
+{% if tests %}
+  {% for test in tests %}
+  <div class="mb-8">
+    <div class="t-eyebrow mb-3">{{ test.title }}</div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {% for part in test.parts.all %}
+      <div class="ml-card p-5 flex flex-col gap-4">
+        <div>
+          <span class="ml-chip mb-2">{{ part.get_part_type_display }}</span>
+          <p class="t-body text-sm mt-2 line-clamp-3">{{ part.prompt|truncatechars:120 }}</p>
+        </div>
+        <div class="flex items-center gap-3 mt-auto">
+          <span class="t-meta text-xs">{{ part.speak_time_seconds|floatformat:0 }}s speaking</span>
+          <a href="{% url 'speaking:exam' part.pk %}" class="ml-btn ml-btn-primary ml-btn-sm" style="margin-left:auto;">Start</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+<div class="py-20 text-center">
+  <div class="text-4xl mb-4">🎤</div>
+  <h3 class="h-display" style="font-size:24px;">No tests yet</h3>
+  <p class="t-body mt-2">Speaking tests will appear here once published.</p>
+</div>
+{% endif %}
+{% endblock %}

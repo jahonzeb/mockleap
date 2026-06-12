@@ -1,0 +1,12 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Listening Results{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="ml-card-2 p-8 text-center mb-8">
+    <div class="t-eyebrow mb-3">{{ attempt.test.title }}</div>
+    <div class="h-serif mb-1" style="font-size:80px;font-weight:600;color:var(--accent);line-height:1;">{{ attempt.band_score|default:"—" }}</div>
+    <div class="t-eyebrow" style="color:var(--muted);">Band Score</div>
+  </div>
+  <div class="flex gap-3"><a href="{% url 'listening:list' %}" class="ml-btn ml-btn-ghost flex-1">Try another</a><a href="{% url 'dashboard:home' %}" class="ml-btn ml-btn-primary flex-1">Dashboard</a></div>
+</div>
+{% endblock %}

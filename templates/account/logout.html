@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}Log out — MockLeap{% endblock %}
+
+{% block body %}
+<div class="flex items-center justify-center min-h-screen" style="background:var(--bg);">
+  <div class="w-full max-w-sm px-6">
+    <div class="text-center mb-8">
+      <a href="/" class="ml-mark text-xl" style="text-decoration:none;">MockLeap</a>
+    </div>
+    <div class="ml-card p-8 text-center">
+      <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style="background:var(--surface-2);">
+        <svg width="22" height="22" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/><path d="M10.5 11L14 8l-3.5-3" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 8H6" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h1 class="h-display mb-2" style="font-size:22px;">Log out?</h1>
+      <p class="t-body mb-6" style="font-size:14px;">Are you sure you want to log out of MockLeap?</p>
+      <form method="post" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="ml-btn ml-btn-primary w-full mb-3">Yes, log out</button>
+      </form>
+      <a href="/dashboard/" class="ml-btn ml-btn-ghost w-full">Cancel</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

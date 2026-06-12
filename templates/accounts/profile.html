@@ -1,0 +1,49 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Profile{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto">
+  <h1 class="h-display mb-6" style="font-size:28px;">Profile</h1>
+
+  <div class="ml-card p-6 mb-6 flex items-center gap-5">
+    {% if user.avatar %}
+      <img src="{{ user.avatar.url }}" class="w-20 h-20 rounded-full object-cover flex-shrink-0" alt="{{ user.username }}">
+    {% else %}
+      <div class="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0" style="background:var(--accent-soft);color:var(--on-accent);">{{ user.username|first|upper }}</div>
+    {% endif %}
+    <div class="flex-1 min-w-0">
+      <div class="text-lg font-semibold" style="color:var(--ink);">{{ user.get_full_name|default:user.username }}</div>
+      <div class="t-meta">{{ user.email }}</div>
+      <div class="flex items-center gap-3 mt-2">
+        <span class="ml-chip ml-chip-accent">{{ user.xp }} XP</span>
+        {% if user.streak_days %}<span class="ml-chip">🔥 {{ user.streak_days }}-day streak</span>{% endif %}
+        {% if user.target_band %}<span class="ml-chip">Target: Band {{ user.target_band }}</span>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="ml-card p-6">
+    <div class="t-eyebrow mb-5">Edit profile</div>
+    <form method="post" action="{% url 'accounts:profile' %}" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="t-eyebrow block mb-1.5">First name</label><input type="text" name="first_name" class="ml-input" value="{{ user.first_name }}"></div>
+        <div><label class="t-eyebrow block mb-1.5">Last name</label><input type="text" name="last_name" class="ml-input" value="{{ user.last_name }}"></div>
+      </div>
+      <div><label class="t-eyebrow block mb-1.5">Bio</label><textarea name="bio" rows="3" class="ml-input" style="height:auto;padding-top:10px;">{{ user.bio }}</textarea></div>
+      <div class="grid grid-cols-2 gap-4">
+        <div><label class="t-eyebrow block mb-1.5">Country</label><input type="text" name="country" class="ml-input" value="{{ user.country }}"></div>
+        <div><label class="t-eyebrow block mb-1.5">Target Band</label><input type="number" name="target_band" step="0.5" min="0" max="9" class="ml-input" value="{{ user.target_band|default:'' }}"></div>
+      </div>
+      <div><label class="t-eyebrow block mb-1.5">Test Date</label><input type="date" name="test_date" class="ml-input" value="{{ user.test_date|date:'Y-m-d'|default:'' }}"></div>
+      <div><label class="t-eyebrow block mb-1.5">Avatar</label><input type="file" name="avatar" accept="image/*" class="ml-input" style="padding-top:8px;"></div>
+      <div class="flex items-center gap-2 pt-2">
+        <input type="checkbox" name="dark_mode" id="dark_mode" {% if user.dark_mode %}checked{% endif %} style="accent-color:var(--ink);">
+        <label for="dark_mode" class="t-body text-sm cursor-pointer">Dark mode by default</label>
+      </div>
+      <button type="submit" class="ml-btn ml-btn-primary">Save changes</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

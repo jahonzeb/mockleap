@@ -1,0 +1,83 @@
+{% extends "layouts/app.html" %}
+{% block page_title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <h1 class="h-display" style="font-size:26px;">Teacher Dashboard</h1>
+  <p class="t-meta mt-1">Review student submissions and manage test content.</p>
+</div>
+
+<!-- Quick links -->
+<div class="grid gap-4 mb-8" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));max-width:700px;">
+  <a href="{% url 'teachers:reading_tests' %}" class="ml-card p-5 flex items-center gap-4" style="text-decoration:none;transition:box-shadow .15s;">
+    <div style="width:40px;height:40px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M3 2h10a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="var(--ink)" stroke-width="1.4"/><path d="M5 5h6M5 8h6M5 11h4" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="text-sm font-semibold" style="color:var(--ink);">Reading Tests</div>
+      <div class="t-meta text-xs">Create & manage</div>
+    </div>
+  </a>
+  <a href="{% url 'teachers:listening_tests' %}" class="ml-card p-5 flex items-center gap-4" style="text-decoration:none;transition:box-shadow .15s;">
+    <div style="width:40px;height:40px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 015 5v2a5 5 0 01-10 0V6a5 5 0 015-5z" stroke="var(--ink)" stroke-width="1.4"/><path d="M8 13v2M6 15h4" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="text-sm font-semibold" style="color:var(--ink);">Listening Tests</div>
+      <div class="t-meta text-xs">Create & manage</div>
+    </div>
+  </a>
+</div>
+
+<!-- Review queues -->
+<div class="t-eyebrow mb-3">Review queue</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5" style="max-width:900px;">
+
+  <!-- Writing queue -->
+  <div class="ml-card" style="padding:0;overflow:hidden;">
+    <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--border);">
+      <span class="text-sm font-semibold" style="color:var(--ink);">Writing</span>
+      {% if writing_count %}
+        <span class="ml-chip ml-chip-warn" style="height:22px;font-size:11px;">{{ writing_count }} pending</span>
+      {% else %}
+        <span class="ml-chip ml-chip-ok" style="height:22px;font-size:11px;">All done</span>
+      {% endif %}
+    </div>
+    {% for s in writing_queue %}
+    <div class="flex items-center gap-3 px-5 py-3 border-b last:border-b-0" style="border-color:var(--border);">
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-medium truncate" style="color:var(--ink);">{{ s.user.username }} — {{ s.task.get_task_type_display }}</div>
+        <div class="t-meta text-xs mt-0.5">{{ s.created_at|date:"M j, H:i" }}</div>
+      </div>
+      <a href="{% url 'teachers:review_writing' s.pk %}" class="ml-btn ml-btn-ghost ml-btn-sm flex-shrink-0">Review</a>
+    </div>
+    {% empty %}
+    <div class="py-8 text-center t-meta text-sm">Queue empty</div>
+    {% endfor %}
+  </div>
+
+  <!-- Speaking queue -->
+  <div class="ml-card" style="padding:0;overflow:hidden;">
+    <div class="flex items-center justify-between px-5 py-4 border-b" style="border-color:var(--border);">
+      <span class="text-sm font-semibold" style="color:var(--ink);">Speaking</span>
+      {% if speaking_count %}
+        <span class="ml-chip ml-chip-warn" style="height:22px;font-size:11px;">{{ speaking_count }} pending</span>
+      {% else %}
+        <span class="ml-chip ml-chip-ok" style="height:22px;font-size:11px;">All done</span>
+      {% endif %}
+    </div>
+    {% for s in speaking_queue %}
+    <div class="flex items-center gap-3 px-5 py-3 border-b last:border-b-0" style="border-color:var(--border);">
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-medium truncate" style="color:var(--ink);">{{ s.user.username }} — {{ s.part.get_part_type_display }}</div>
+        <div class="t-meta text-xs mt-0.5">{{ s.submitted_at|date:"M j, H:i" }}</div>
+      </div>
+      <a href="{% url 'teachers:review_speaking' s.pk %}" class="ml-btn ml-btn-ghost ml-btn-sm flex-shrink-0">Review</a>
+    </div>
+    {% empty %}
+    <div class="py-8 text-center t-meta text-sm">Queue empty</div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
