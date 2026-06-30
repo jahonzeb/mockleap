@@ -38,24 +38,31 @@
      onclick="closeSidebar()"></div>
 
 <script>
-function closeSidebar() {
-  document.getElementById('sidebar').classList.add('-translate-x-full');
-  document.getElementById('sidebar-overlay').classList.add('hidden');
-}
+(function () {
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  var btn = document.getElementById('mobile-menu-btn');
+  if (!sb || !ov || !btn) return;
 
-const _mobileBtn = document.getElementById('mobile-menu-btn');
-if (_mobileBtn) {
-  _mobileBtn.addEventListener('click', () => {
-    const sb = document.getElementById('sidebar');
-    const ov = document.getElementById('sidebar-overlay');
-    const isOpen = !sb.classList.contains('-translate-x-full');
-    if (isOpen) { closeSidebar(); }
-    else {
-      sb.classList.remove('-translate-x-full');
-      ov.classList.remove('hidden');
-    }
+  function openSidebar() {
+    sb.style.transform = 'translateX(0)';
+    ov.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  window.closeSidebar = function () {
+    sb.style.transform = 'translateX(-100%)';
+    ov.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var isOpen = sb.style.transform === 'translateX(0)' || sb.style.transform === 'translateX(0px)';
+    isOpen ? closeSidebar() : openSidebar();
   });
-}
 
+  ov.addEventListener('click', closeSidebar);
+}());
 </script>
 {% endblock %}
