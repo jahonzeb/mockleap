@@ -43,7 +43,7 @@ class User(AbstractUser):
 
     @property
     def is_teacher(self):
-        return self.role == self.ROLE_TEACHER
+        return self.role == self.ROLE_TEACHER or self.is_staff or self.is_superuser
 
     @property
     def initials(self):

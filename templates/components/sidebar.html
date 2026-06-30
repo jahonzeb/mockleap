@@ -57,7 +57,7 @@
       {% if unread_count %}<span class="ml-chip ml-chip-warn ml-auto text-xs" style="height:18px;padding:0 6px;">{{ unread_count }}</span>{% endif %}
     </a>
 
-    {% if user.role == 'teacher' %}
+    {% if user.role == 'teacher' or user.is_staff or user.is_superuser %}
     <p class="t-eyebrow px-2.5 pt-4 pb-1">Teacher</p>
     <a href="{% url 'teachers:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' and request.resolver_match.app_name == 'teachers' %}active{% endif %}">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 9l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
