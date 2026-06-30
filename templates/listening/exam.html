@@ -353,6 +353,39 @@ function mlSwitchSection(idx) {
 
 mlSwitchSection(0);
 
+// ── Fullscreen toggle ────────────────────────────────────────────────
+function toggleFullscreenLS() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const full = !!document.fullscreenElement;
+  const exp  = document.getElementById('fs-ico-expand-ls');
+  const cmp  = document.getElementById('fs-ico-compress-ls');
+  if (exp) exp.style.display = full ? 'none' : '';
+  if (cmp) cmp.style.display = full ? '' : 'none';
+});
+
+// ── Highlight mode toggle (topbar) ───────────────────────────────────
+function toggleHlModeLS() {
+  const btn = document.getElementById('hl-toggle-btn-ls');
+  const isActive = btn.dataset.active === '1';
+  if (isActive) {
+    btn.dataset.active = '0';
+    btn.style.background = '';
+    btn.style.color = '';
+  } else {
+    btn.dataset.active = '1';
+    btn.style.background = 'rgba(250,246,236,.20)';
+    btn.style.color = '#fef08a';
+    const tb = document.getElementById('hl-toolbar-ls');
+    if (tb) { tb.style.opacity = '1'; tb.style.pointerEvents = 'auto'; }
+  }
+}
+
 // ── Audio player (plays once, no pause, no seek) ─────────────────────
 (function () {
   const audio = document.getElementById('main-audio');
