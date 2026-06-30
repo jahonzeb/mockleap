@@ -23,11 +23,148 @@
 .ml-radio-on{border-color:var(--ink);}
 .ml-radio-on::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--ink);}
 @keyframes blink{50%{opacity:0;}}
+
+/* ── Landing mobile nav ── */
+.ml-nav-links { display:flex; }
+#lp-menu-btn  { display:none; }
+#lp-mobile-menu {
+  display:none;
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+}
+#lp-mobile-menu.open { display:block; }
+#lp-mobile-menu-panel {
+  position:absolute;top:0;left:0;right:0;
+  background:var(--bg-2);padding:20px;
+  border-radius:0 0 20px 20px;
+  display:flex;flex-direction:column;gap:6px;
+}
+
+/* ── Landing page mobile responsive ── */
+@media (max-width: 768px) {
+  /* Nav */
+  .ml-nav-links   { display:none !important; }
+  #lp-menu-btn    { display:flex !important; }
+  .ml-nav-float   { padding:10px 16px !important; gap:0 !important; }
+
+  /* Sections padding */
+  section[style*="padding:48px 60px"],
+  section[style*="padding:120px 60px"],
+  section[style*="padding:120px 0"],
+  section[style*="padding:120px 60px 0"] { padding: 64px 20px 0 !important; }
+  section[style*="padding:120px 60px 80px"] { padding: 64px 20px 48px !important; }
+
+  /* Hero */
+  div[style*="grid-template-columns:1.15fr 1fr"] {
+    display:flex !important; flex-direction:column !important; gap:40px !important;
+  }
+  h1[style*="font-size:clamp(52px"] { font-size:clamp(36px,9vw,52px) !important; }
+  div[style*="position:relative;width:100%;height:540px"] { display:none !important; }
+  div[style*="gap:24px;margin-top:32px"] { flex-wrap:wrap !important; gap:12px !important; }
+  .ml-btn-lg { padding:12px 20px !important; font-size:14px !important; }
+
+  /* Trust bar */
+  div[style*="padding:32px 60px"] { padding:28px 20px !important; }
+  div[style*="justify-content:space-between"] > .ml-row[style*="gap:48px"] {
+    gap:20px !important; flex-wrap:wrap !important; justify-content:flex-start !important;
+  }
+
+  /* Skill cards 4-col → 2-col */
+  div[style*="grid-template-columns:repeat(4,1fr)"] {
+    grid-template-columns: repeat(2,1fr) !important; gap:12px !important;
+  }
+
+  /* Exam preview tabs */
+  div[style*="padding:5px;background:var(--inset);border-radius:99px"] {
+    flex-wrap:wrap !important; gap:4px !important;
+  }
+  div[style*="height:560px;overflow:hidden"] { height:auto !important; min-height:300px; }
+  div[id="tab-reading"][style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns:1fr !important; height:auto !important;
+  }
+  div[id="tab-reading"] > div:last-child { border-left:none !important; border-top:.5px solid var(--border); }
+  div[id="tab-writing"][style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns:1fr !important; height:auto !important;
+  }
+  div[id="tab-speaking"][style*="grid-template-columns:1fr 320px"] {
+    grid-template-columns:1fr !important; height:auto !important;
+  }
+  div[id="tab-listening"],div[id="tab-speaking"],div[id="tab-writing"],div[id="tab-reading"] {
+    padding:20px !important;
+  }
+
+  /* Features 2-col → 1-col */
+  div[style*="grid-template-columns:repeat(2,1fr)"] {
+    grid-template-columns:1fr !important; gap:12px !important;
+  }
+
+  /* Stats dark section */
+  section[style*="background:var(--ink)"] div[style*="grid-template-columns:repeat(4,1fr)"] {
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  section[style*="background:var(--ink)"] div[style*="padding:88px 60px"] {
+    padding:48px 20px !important;
+  }
+  div[style*="font-size:56px"] { font-size:36px !important; }
+
+  /* Testimonials 3-col → 1-col */
+  div[style*="grid-template-columns:repeat(3,1fr)"] {
+    grid-template-columns:1fr !important; gap:12px !important;
+  }
+
+  /* FAQ 2-col → 1-col */
+  div[style*="grid-template-columns:1fr 1.5fr"] {
+    grid-template-columns:1fr !important; gap:32px !important;
+  }
+  .faq-answer { margin-right:0 !important; }
+
+  /* CTA */
+  div[style*="padding:80px;text-align:center"] { padding:40px 24px !important; }
+  h2[style*="font-size:clamp(40px"] { font-size:clamp(28px,8vw,44px) !important; }
+
+  /* Footer 5-col → 2-col */
+  div[style*="grid-template-columns:1.5fr repeat(4,1fr)"] {
+    grid-template-columns:1fr 1fr !important; gap:28px !important;
+  }
+  footer[style*="padding:80px 60px"] { padding:48px 20px 24px !important; }
+  footer .ml-row[style*="justify-content:space-between;margin-top:64px"] {
+    flex-direction:column !important; gap:12px !important; align-items:flex-start !important;
+  }
+
+  /* Hero CTA buttons stack */
+  div[style*="gap:12px;margin-top:36px"].ml-row { flex-direction:column !important; align-items:flex-start !important; }
+  div[style*="gap:12px;justify-content:center"].ml-row { flex-direction:column !important; align-items:center !important; }
+}
 </style>
 {% endblock %}
 
 {% block body %}
 <div style="position:relative;z-index:1;">
+
+<!-- Mobile menu overlay -->
+<div id="lp-mobile-menu" onclick="if(event.target===this)closeLpMenu()">
+  <div id="lp-mobile-menu-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <a href="/" class="ml-mark" style="text-decoration:none;"><span class="ml-mark-dot" style="width:8px;height:8px;"></span><span>MockLeap</span></a>
+      <button onclick="closeLpMenu()" style="width:32px;height:32px;border:none;background:var(--surface-2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <a href="{% url 'reading:list' %}"  style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Reading</a>
+    <a href="{% url 'listening:list' %}" style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Listening</a>
+    <a href="{% url 'writing:list' %}"  style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Writing</a>
+    <a href="{% url 'speaking:list' %}" style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Speaking</a>
+    <a href="{% url 'community:rooms' %}" style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Community</a>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard:home' %}" class="ml-btn ml-btn-ghost ml-btn-sm" style="flex:1;justify-content:center;">Dashboard</a>
+      {% else %}
+        <a href="{% url 'account_login' %}" class="ml-btn ml-btn-ghost ml-btn-sm" style="flex:1;justify-content:center;">Sign in</a>
+        <a href="{% url 'account_signup' %}" class="ml-btn ml-btn-accent ml-btn-sm" style="flex:1;justify-content:center;">Start free</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
 <!-- NAV (floating glass pill) -->
 <nav class="ml-nav-float ml-row" style="justify-content:space-between;">
@@ -45,6 +182,16 @@
     </div>
   </div>
   <div class="ml-row" style="gap:8px;flex-shrink:0;">
+    <!-- Hamburger (mobile only) -->
+    <button id="lp-menu-btn" onclick="openLpMenu()" aria-label="Open menu"
+            style="width:34px;height:34px;border:none;background:transparent;cursor:pointer;
+                   border-radius:10px;color:var(--ink);display:flex;align-items:center;justify-content:center;">
+      <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+        <rect x="2" y="4"    width="14" height="1.5" rx=".75" fill="currentColor"/>
+        <rect x="2" y="8.25" width="14" height="1.5" rx=".75" fill="currentColor"/>
+        <rect x="2" y="12.5" width="14" height="1.5" rx=".75" fill="currentColor"/>
+      </svg>
+    </button>
     <button onclick="DarkMode.toggle()" class="ml-btn ml-btn-ghost ml-btn-sm" style="padding:0;min-width:34px;" aria-label="Toggle dark mode">
       <svg class="dark:hidden" width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M8 5a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       <svg class="hidden dark:block" width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8.5A5.5 5.5 0 117.5 3c-.5 2 .5 4.5 2.5 5.5 1.5.7 2.5.5 3 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -617,6 +764,16 @@ function toggleFaq(item){
   const isOpen=item.classList.contains('open');
   document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
   if(!isOpen)item.classList.add('open');
+}
+
+// Mobile nav
+function openLpMenu(){
+  document.getElementById('lp-mobile-menu').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLpMenu(){
+  document.getElementById('lp-mobile-menu').classList.remove('open');
+  document.body.style.overflow='';
 }
 </script>
 {% endblock %}
