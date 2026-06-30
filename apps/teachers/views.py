@@ -24,7 +24,8 @@ def teacher_required(view_func):
     from functools import wraps
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated or request.user.role != 'teacher':
+        u = request.user
+        if not u.is_authenticated or (u.role != 'teacher' and not u.is_staff and not u.is_superuser):
             return redirect('core:landing')
         return view_func(request, *args, **kwargs)
     return wrapper

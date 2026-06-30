@@ -33,27 +33,6 @@
 .hl-blue      { background:#BFDBFE; }
 .hl-pink      { background:#FECDD3; }
 
-/* ── Highlight toolbar (floating) ───────────────────────── */
-#hl-toolbar {
-  position:fixed;z-index:100;
-  display:none;
-  align-items:center;gap:4px;
-  padding:5px 8px;
-  background:var(--bg-2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  box-shadow:0 4px 20px rgba(0,0,0,.14);
-}
-#hl-toolbar button {
-  width:22px;height:22px;border-radius:50%;border:2px solid transparent;
-  cursor:pointer;transition:transform .1s,border-color .1s;
-}
-#hl-toolbar button:hover { transform:scale(1.18);border-color:var(--ink); }
-#hl-erase {
-  width:auto!important;height:22px!important;border-radius:6px!important;
-  padding:0 8px;font-size:11px;font-weight:600;background:var(--surface-2);color:var(--muted);
-}
-#hl-erase:hover { border-color:var(--warn)!important;color:var(--warn); }
 
 /* ── Question answer inputs ─────────────────────────────── */
 .q-label     { display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;
@@ -86,11 +65,31 @@
       <button class="tb-btn" onclick="changeFontSize(0)"  title="Reset font size"    style="font-size:10px;">↺</button>
       <button class="tb-btn" onclick="changeFontSize(1)"  title="Increase font size" style="font-size:12px;font-weight:700;">A+</button>
       <div style="width:1px;height:16px;background:rgba(250,246,236,.18);margin:0 2px;"></div>
-      <button class="tb-btn" id="hl-toggle-btn" onclick="toggleHlMode()" title="Highlight">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-          <path d="M2 12l2.5-2.5 7-7 2 2-7 7L2 14v-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <!-- Highlight pencil + inline color picker -->
+      <div style="position:relative;display:flex;align-items:center;gap:3px;">
+        <button class="tb-btn" id="hl-toggle-btn" onclick="toggleHlMode()" title="Highlight mode">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+            <path d="M2 12l2.5-2.5 7-7 2 2-7 7L2 14v-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <!-- Color dots — shown when hl mode is active -->
+        <div id="hl-colors" style="display:none;align-items:center;gap:4px;">
+          <button onclick="setHlColor('hl-yellow')" title="Yellow"
+                  style="width:18px;height:18px;border-radius:50%;border:2px solid transparent;background:#FDE68A;cursor:pointer;flex-shrink:0;transition:transform .12s;"
+                  onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" id="hlc-yellow"></button>
+          <button onclick="setHlColor('hl-green')"  title="Green"
+                  style="width:18px;height:18px;border-radius:50%;border:2px solid transparent;background:#BBF7D0;cursor:pointer;flex-shrink:0;transition:transform .12s;"
+                  onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" id="hlc-green"></button>
+          <button onclick="setHlColor('hl-blue')"   title="Blue"
+                  style="width:18px;height:18px;border-radius:50%;border:2px solid transparent;background:#BFDBFE;cursor:pointer;flex-shrink:0;transition:transform .12s;"
+                  onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" id="hlc-blue"></button>
+          <button onclick="setHlColor('hl-pink')"   title="Pink"
+                  style="width:18px;height:18px;border-radius:50%;border:2px solid transparent;background:#FECDD3;cursor:pointer;flex-shrink:0;transition:transform .12s;"
+                  onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" id="hlc-pink"></button>
+          <button onclick="clearHighlights()" title="Clear all highlights"
+                  style="height:20px;padding:0 7px;border-radius:5px;border:1px solid rgba(250,246,236,.30);background:transparent;color:rgba(250,246,236,.65);font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
       <div style="width:1px;height:16px;background:rgba(250,246,236,.18);margin:0 2px;"></div>
       <button class="tb-btn" id="fs-toggle-btn" onclick="toggleFullscreen()" title="Full screen">
         <svg id="fs-ico-expand" width="13" height="13" viewBox="0 0 16 16" fill="none">
@@ -114,14 +113,6 @@
     </div>
   </div>
 
-  <!-- ── Floating highlight toolbar ──────────────────────────────── -->
-  <div id="hl-toolbar">
-    <button title="Yellow"  onclick="applyHighlight('hl-yellow')"  style="background:#FDE68A;"></button>
-    <button title="Green"   onclick="applyHighlight('hl-green')"   style="background:#BBF7D0;"></button>
-    <button title="Blue"    onclick="applyHighlight('hl-blue')"    style="background:#BFDBFE;"></button>
-    <button title="Pink"    onclick="applyHighlight('hl-pink')"    style="background:#FECDD3;"></button>
-    <button id="hl-erase"   onclick="clearHighlights()">Clear all</button>
-  </div>
 
   <!-- ── Main split: passage | questions ────────────────────────── -->
   <div id="exam-body" style="flex:1;display:grid;grid-template-columns:50% 4px 1fr;grid-template-rows:1fr;overflow:hidden;min-height:0;height:0;">
@@ -146,7 +137,7 @@
       {% for passage in passages %}
       <div id="passage-{{ passage.order }}"
            class="passage-zone"
-           style="{% if not forloop.first %}display:none;{% endif %}padding:28px 40px 56px;">
+           style="{% if not forloop.first %}display:none;{% endif %}padding:28px 40px 56px;min-height:calc(100% - 44px);box-sizing:border-box;">
         <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
                     color:var(--muted);margin-bottom:6px;">Passage {{ passage.order }}</div>
         <h2 style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:700;
@@ -180,7 +171,7 @@
     <!-- RIGHT: questions -->
     <div class="exam-pane" id="question-pane" style="min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden;background:var(--bg-2);padding:0;">
       <form id="exam-form" method="post" action="{% url 'reading:submit' attempt.pk %}"
-            style="padding:20px 24px 80px;">
+            style="padding:20px 24px 80px;min-height:100%;box-sizing:border-box;">
         {% csrf_token %}
 
         {% for passage in passages %}
@@ -309,7 +300,6 @@ function switchPassage(n) {
 
 // ── Highlighting (passage + questions) ───────────────────────────
 const STORAGE_KEY = 'hl-{{ attempt.pk }}';
-const toolbar     = document.getElementById('hl-toolbar');
 
 // Any highlightable zone: passage text OR question text
 function getHighlightZone(node) {
@@ -317,50 +307,99 @@ function getHighlightZone(node) {
   return el?.closest('.passage-body') || el?.closest('.q-text') || null;
 }
 
-document.addEventListener('mouseup', (e) => {
-  if (toolbar.contains(e.target)) return;
-  const sel = window.getSelection();
-  if (!sel || sel.isCollapsed || !sel.toString().trim()) { hideToolbar(); return; }
-  const zone = getHighlightZone(sel.anchorNode);
-  if (!zone) { hideToolbar(); return; }
-  const rect = sel.getRangeAt(0).getBoundingClientRect();
-  showToolbar(rect.left + rect.width / 2, rect.top + window.scrollY - 50);
-});
-
-document.addEventListener('mousedown', (e) => {
-  if (!toolbar.contains(e.target)) hideToolbar();
-});
-
-function showToolbar(x, y) {
-  toolbar.style.display = 'flex';
-  const tw = 200;
-  toolbar.style.left = Math.max(8, Math.min(window.innerWidth - tw - 8, x - tw/2)) + 'px';
-  toolbar.style.top  = Math.max(8, y) + 'px';
+// Clamp range so it never extends beyond zone's content
+function clampToZone(range, zone) {
+  const zr = document.createRange();
+  zr.selectNodeContents(zone);
+  const cr = document.createRange();
+  cr.setStart(
+    range.compareBoundaryPoints(Range.START_TO_START, zr) >= 0 ? range.startContainer : zr.startContainer,
+    range.compareBoundaryPoints(Range.START_TO_START, zr) >= 0 ? range.startOffset   : zr.startOffset
+  );
+  cr.setEnd(
+    range.compareBoundaryPoints(Range.END_TO_END, zr) <= 0 ? range.endContainer : zr.endContainer,
+    range.compareBoundaryPoints(Range.END_TO_END, zr) <= 0 ? range.endOffset   : zr.endOffset
+  );
+  return cr.collapsed ? null : cr;
 }
-function hideToolbar() { toolbar.style.display = 'none'; }
 
-function applyHighlight(colorClass) {
+// Auto-apply highlight on mouseup when hl mode is active
+document.addEventListener('mouseup', (e) => {
+  if (!hlModeActive) return;
+  if (e.target.closest('#exam-topbar-glass')) return;
   const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) return;
+  if (!sel || sel.isCollapsed || !sel.toString().trim()) return;
   const range = sel.getRangeAt(0);
-  const zone  = getHighlightZone(range.startContainer)
-             || getHighlightZone(range.commonAncestorContainer);
+  const zone = getHighlightZone(range.startContainer)
+            || getHighlightZone(range.commonAncestorContainer);
   if (!zone) return;
+  const clamped = clampToZone(range, zone);
+  if (!clamped) return;
+  applyHighlight(currentHlColor, clamped, zone);
+});
 
+function applyHighlight(colorClass, range, zone) {
+  // Split by paragraph boundaries so extractContents() never pulls
+  // <p> tags out of the DOM (which breaks layout).
+  splitRangeByParagraphs(range, zone).forEach(r => applyRangeHighlight(r, colorClass, zone));
+  window.getSelection()?.removeAllRanges();
+  zone.normalize();
+  saveHighlights();
+}
+
+// Returns one Range per <p> that overlaps the original range.
+// Falls back to the original range if the zone has no <p> tags.
+function splitRangeByParagraphs(range, zone) {
+  const paras = Array.from(zone.querySelectorAll('p'));
+  if (!paras.length) return [range];
+
+  const results = [];
+  paras.forEach(p => {
+    const pr = document.createRange();
+    pr.selectNodeContents(p);
+    // No overlap?
+    if (range.compareBoundaryPoints(Range.END_TO_START, pr) >= 0) return;
+    if (range.compareBoundaryPoints(Range.START_TO_END, pr) <= 0) return;
+    // Intersect: clamp start/end to paragraph boundary
+    const ir = document.createRange();
+    if (range.compareBoundaryPoints(Range.START_TO_START, pr) >= 0) {
+      ir.setStart(range.startContainer, range.startOffset);
+    } else {
+      ir.setStart(pr.startContainer, pr.startOffset);
+    }
+    if (range.compareBoundaryPoints(Range.END_TO_END, pr) <= 0) {
+      ir.setEnd(range.endContainer, range.endOffset);
+    } else {
+      ir.setEnd(pr.endContainer, pr.endOffset);
+    }
+    if (!ir.collapsed) results.push(ir);
+  });
+
+  return results.length ? results : [range];
+}
+
+function applyRangeHighlight(range, colorClass, zone) {
+  const frag = range.extractContents();
+  // Unwrap any nested .hl spans (re-coloring existing highlight)
+  frag.querySelectorAll('.hl').forEach(old => {
+    const p = old.parentNode;
+    while (old.firstChild) p.insertBefore(old.firstChild, old);
+    p.removeChild(old);
+  });
   const span = document.createElement('span');
   span.className = 'hl ' + colorClass;
   span.title = 'Click to remove';
-  try {
-    range.surroundContents(span);
-  } catch (_) {
-    const frag = range.extractContents();
-    span.appendChild(frag);
-    range.insertNode(span);
-  }
+  span.appendChild(frag);
+  range.insertNode(span);
+  // Remove empty .hl ghosts left by the split
+  zone.querySelectorAll('.hl').forEach(s => {
+    if (!s.textContent) {
+      const p = s.parentNode;
+      while (s.firstChild) p.insertBefore(s.firstChild, s);
+      p.removeChild(s);
+    }
+  });
   attachRemoveHandler(span);
-  sel.removeAllRanges();
-  hideToolbar();
-  saveHighlights();
 }
 
 function attachRemoveHandler(span) {
@@ -380,7 +419,6 @@ function clearHighlights() {
     p.removeChild(span);
   });
   try { localStorage.removeItem(STORAGE_KEY); } catch(_) {}
-  hideToolbar();
 }
 
 // ── Persist highlights ─────────────────────────────────────────────
@@ -477,22 +515,38 @@ document.addEventListener('fullscreenchange', () => {
   document.getElementById('fs-ico-compress').style.display = full ? '' : 'none';
 });
 
-// ── Highlight mode toggle (topbar button) ──────────────────────
+// ── Highlight mode ──────────────────────────────────────────────
+let hlModeActive  = false;
+let currentHlColor = 'hl-yellow';
+
 function toggleHlMode() {
-  const btn = document.getElementById('hl-toggle-btn');
-  const isActive = btn.dataset.active === '1';
-  if (isActive) {
-    btn.dataset.active = '0';
-    btn.style.background = '';
-    btn.style.color = '';
+  hlModeActive = !hlModeActive;
+  const btn    = document.getElementById('hl-toggle-btn');
+  const colors = document.getElementById('hl-colors');
+  if (hlModeActive) {
+    btn.style.background   = 'rgba(253,230,138,.30)';
+    btn.style.color        = '#fef08a';
+    btn.style.borderColor  = 'rgba(253,230,138,.60)';
+    colors.style.display   = 'flex';
+    document.body.style.cursor = 'text';
+    setHlColor(currentHlColor); // highlight active dot
   } else {
-    btn.dataset.active = '1';
-    btn.style.background = 'rgba(250,246,236,.20)';
-    btn.style.color = '#fef08a';
-    // Show highlight toolbar briefly as hint
-    const tb = document.getElementById('hl-toolbar');
-    if (tb) { tb.style.opacity = '1'; tb.style.pointerEvents = 'auto'; }
+    btn.style.background  = '';
+    btn.style.color       = '';
+    btn.style.borderColor = '';
+    colors.style.display  = 'none';
+    document.body.style.cursor = '';
   }
+}
+
+function setHlColor(cls) {
+  currentHlColor = cls;
+  // Mark active dot with white ring
+  ['hl-yellow','hl-green','hl-blue','hl-pink'].forEach(c => {
+    const dotId = 'hlc-' + c.replace('hl-','');
+    const dot = document.getElementById(dotId);
+    if (dot) dot.style.borderColor = (c === cls) ? 'rgba(255,255,255,.90)' : 'transparent';
+  });
 }
 
 // ── Timer warning colors ──────────────────────────────────────────
