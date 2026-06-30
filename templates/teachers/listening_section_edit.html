@@ -34,6 +34,16 @@
         <textarea name="description" class="ml-input" rows="2"
                   style="width:100%;font-family:inherit;resize:none;">{{ section.description }}</textarea>
       </div>
+      <div style="margin-bottom:14px;">
+        <label class="t-eyebrow block mb-1">Section audio file</label>
+        {% if section.audio_file %}
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+          <audio controls style="height:32px;flex:1;max-width:360px;" src="{{ section.audio_file.url }}"></audio>
+          <span class="t-meta" style="font-size:11px;">Upload below to replace</span>
+        </div>
+        {% endif %}
+        <input type="file" name="audio_file" accept="audio/*" class="ml-input" style="width:100%;padding:8px;">
+      </div>
       <button type="submit" class="ml-btn ml-btn-ghost ml-btn-sm">Save section</button>
     </form>
   </div>

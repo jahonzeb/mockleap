@@ -80,9 +80,49 @@
   <div class="ml-card mb-3 py-8 text-center t-meta">No sections yet. Add one below.</div>
   {% endfor %}
 
-  <!-- Add section form -->
-  <div class="ml-card" style="padding:24px;margin-top:8px;">
-    <div class="t-eyebrow mb-4">Add section</div>
+  <!-- Import from HTML -->
+  <div class="ml-card mb-3" style="padding:24px;">
+    <div class="flex items-center justify-between mb-4">
+      <div class="t-eyebrow">Import from HTML file</div>
+      <a href="/static/examples/listening_example.html" download class="t-meta text-xs" style="color:var(--accent);text-decoration:none;">
+        ↓ Download example HTML
+      </a>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="import_html">
+      <div class="grid gap-4 mb-4" style="grid-template-columns:1fr 180px 140px;">
+        <div>
+          <label class="t-eyebrow block mb-1">HTML file (with audio)</label>
+          <input type="file" name="html_file" accept=".html,.htm" required class="ml-input" style="width:100%;padding:8px;">
+        </div>
+        <div>
+          <label class="t-eyebrow block mb-1">Import mode</label>
+          <select name="part_mode" id="l-part-mode" class="ml-input" style="width:100%;" onchange="toggleListeningPart()">
+            <option value="single">Single part</option>
+            <option value="full">Full test (4 parts)</option>
+          </select>
+        </div>
+        <div id="l-part-num-wrap">
+          <label class="t-eyebrow block mb-1">Part number</label>
+          <select name="part_number" class="ml-input" style="width:100%;">
+            <option value="1">Part 1</option>
+            <option value="2">Part 2</option>
+            <option value="3">Part 3</option>
+            <option value="4">Part 4</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="ml-btn ml-btn-primary">Import →</button>
+        <span class="t-meta text-xs">Audio embedded as base64 in HTML will be saved automatically.</span>
+      </div>
+    </form>
+  </div>
+
+  <!-- Add section manually -->
+  <div class="ml-card" style="padding:24px;">
+    <div class="t-eyebrow mb-4">Add section manually</div>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="hidden" name="action" value="add_section">
@@ -103,9 +143,16 @@
                   placeholder="Brief description shown to students..."
                   style="width:100%;font-family:inherit;resize:none;"></textarea>
       </div>
-      <button type="submit" class="ml-btn ml-btn-primary">Add section →</button>
+      <button type="submit" class="ml-btn ml-btn-ghost">Add section →</button>
     </form>
   </div>
+
+<script>
+function toggleListeningPart() {
+  var mode = document.getElementById('l-part-mode').value;
+  document.getElementById('l-part-num-wrap').style.display = (mode === 'single') ? '' : 'none';
+}
+</script>
 
 </div>
 {% endblock %}

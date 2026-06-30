@@ -5,6 +5,9 @@ from django.urls import reverse
 from django.db.models import Max
 from django.utils import timezone
 
+import base64, tempfile, os
+from django.core.files.base import ContentFile
+
 from apps.writing.models import WritingSubmission
 from apps.speaking.models import SpeakingSubmission
 from apps.reading.models import ReadingTest, ReadingPassage, QuestionGroup, Question
@@ -14,6 +17,7 @@ from .forms import (
     ReadingTestForm, ReadingPassageForm, QuestionGroupForm, ReadingQuestionForm,
     ListeningTestForm, ListeningSectionForm, ListeningQuestionForm,
 )
+from .html_import import parse_reading_html, parse_listening_html
 
 
 def teacher_required(view_func):
@@ -145,6 +149,26 @@ def reading_test_edit(request, pk):
         elif action == 'toggle_publish':
             test.is_published = not test.is_published
             test.save()
+            return redirect('teachers:reading_test_edit', pk=pk)
+
+        elif action == 'import_html':
+            html_file = request.FILES.get('html_file')
+            part_mode = request.POST.get('part_mode', 'single')
+            part_number = int(request.POST.get('part_number', 1))
+
+            if html_file:
+                html_content = html_file.read().decode('utf-8', errors='replace')
+                passages_data = parse_reading_html(html_content)
+
+                if part_mode == 'single':
+                    # Only import the first passage, set order = part_number
+                    if passages_data:
+                        _create_reading_passage(test, passages_data[0], part_number)
+                else:
+                    # Full import: use order from parsed data (1-based index)
+                    for idx, pdata in enumerate(passages_data, start=1):
+                        _create_reading_passage(test, pdata, idx)
+
             return redirect('teachers:reading_test_edit', pk=pk)
 
     form  = ReadingTestForm(instance=test)
@@ -289,6 +313,29 @@ def listening_test_edit(request, pk):
             test.save()
             return redirect('teachers:listening_test_edit', pk=pk)
 
+        elif action == 'import_html':
+            html_file = request.FILES.get('html_file')
+            part_mode = request.POST.get('part_mode', 'single')
+            part_number = int(request.POST.get('part_number', 1))
+
+            if html_file:
+                html_content = html_file.read().decode('utf-8', errors='replace')
+                parsed = parse_listening_html(html_content)
+
+                # Save embedded audio to the section or test
+                audio_src = parsed.get('audio_src')
+
+                if part_mode == 'single':
+                    sections_data = parsed.get('sections', [])
+                    if sections_data:
+                        _create_listening_section(test, sections_data[0], part_number, audio_src)
+                else:
+                    for idx, sdata in enumerate(parsed.get('sections', []), start=1):
+                        _create_listening_section(test, sdata, idx,
+                                                  audio_src if idx == 1 else None)
+
+            return redirect('teachers:listening_test_edit', pk=pk)
+
     form     = ListeningTestForm(instance=test)
     sform    = ListeningSectionForm(initial={'order': test.sections.count() + 1})
     sections = test.sections.prefetch_related('questions').all()
@@ -351,3 +398,73 @@ def listening_section_edit(request, pk):
     return render(request, 'teachers/listening_section_edit.html',
                   {'section': section, 'form': form, 'questions': questions,
                    'next_q_num': next_q_num, 'mcq_option_fields': mcq_option_fields})
+
+
+# ── HTML import helpers ───────────────────────────────────────────────────────
+
+def _create_reading_passage(test, pdata, order):
+    passage = ReadingPassage.objects.create(
+        test=test,
+        order=order,
+        title=pdata.get('title', 'Passage'),
+        source=pdata.get('source', ''),
+        content=pdata.get('content', ''),
+    )
+    for gdata in pdata.get('groups', []):
+        grp = QuestionGroup.objects.create(
+            passage=passage,
+            question_type=gdata.get('type', 'fill'),
+            instructions=gdata.get('instructions', ''),
+            order=QuestionGroup.objects.filter(passage=passage).count() + 1,
+        )
+        for qdata in gdata.get('questions', []):
+            Question.objects.create(
+                group=grp,
+                number=qdata.get('number', 0),
+                text=qdata.get('text', ''),
+                correct_answer=qdata.get('answer', ''),
+                option_a=qdata.get('option_a', ''),
+                option_b=qdata.get('option_b', ''),
+                option_c=qdata.get('option_c', ''),
+                option_d=qdata.get('option_d', ''),
+            )
+    return passage
+
+
+def _create_listening_section(test, sdata, order, audio_src=None):
+    section = ListeningSection.objects.create(
+        test=test,
+        order=order,
+        title=sdata.get('title', f'Section {order}'),
+        description=sdata.get('description', ''),
+    )
+    if audio_src and audio_src.startswith('data:audio'):
+        try:
+            header, b64data = audio_src.split(',', 1)
+            ext = 'mp3'
+            if 'ogg' in header:
+                ext = 'ogg'
+            elif 'wav' in header:
+                ext = 'wav'
+            audio_bytes = base64.b64decode(b64data)
+            section.audio_file.save(
+                f'section_{test.pk}_{order}.{ext}',
+                ContentFile(audio_bytes),
+                save=True,
+            )
+        except Exception:
+            pass
+
+    for qdata in sdata.get('questions', []):
+        ListeningQuestion.objects.create(
+            section=section,
+            number=qdata.get('number', 0),
+            text=qdata.get('text', ''),
+            question_type=qdata.get('type', 'fill'),
+            correct_answer=qdata.get('answer', ''),
+            option_a=qdata.get('option_a', ''),
+            option_b=qdata.get('option_b', ''),
+            option_c=qdata.get('option_c', ''),
+            option_d=qdata.get('option_d', ''),
+        )
+    return section

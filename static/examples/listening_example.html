@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  MockLeap Listening Import Format — AI Template Guide   ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  QANDAY ISHLATILADI:
+  1. Bu faylni AI'ga bering va o'z savollaringiz bilan to'ldiring
+  2. Teacher paneliga boring: Listening Tests → test → Import from HTML
+  3. "Single Part" yoki "Full Test" tanlang va faylni yuklang
+
+  AUDIO HAQIDA:
+  - Agar audio base64 formatida bo'lsa: src="data:audio/mpeg;base64,..."
+  - Agar audio keyinroq yuklanasa: src="" qoldiring (bo'sh)
+  - Audio test sahifasida alohida ham yuklanishi mumkin
+
+  SAVOL TURLARI (data-type):
+  ┌────────┬────────────────────────────────────────────────┐
+  │ fill   │ Form/Note/Table/Sentence completion            │
+  │ mcq    │ Multiple choice (A/B/C yoki A/B/C/D)          │
+  │ match  │ Matching (ro'yxatdan tanlash)                  │
+  │ short  │ Short answer question                          │
+  └────────┴────────────────────────────────────────────────┘
+
+  TO'G'RI JAVOB (data-answer):
+  - fill  → passage'dagi so'z/ibora: "London" yoki "25 pounds"
+  - mcq   → faqat harf: A yoki B yoki C yoki D
+  - match → harf yoki raqam: A, B, C... yoki i, ii, iii...
+
+  MCQ VARIANTLARI:
+  - Variantlarni faqat matn sifatida yozing (A. B. C. prefikssiz)
+  - Tizim A/B/C/D harflarini avtomatik qo'shadi
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Listening Import Example — Section 1</title>
+</head>
+<body>
+
+<!--
+  AUDIO — ixtiyoriy
+  Base64 formatida kiritilsa, import paytida serverga saqlanadi.
+  Bo'sh qoldirilsa, audio test sahifasida alohida yuklanadi.
+-->
+<audio class="ml-audio" src="" controls></audio>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION 1 — Kundalik/ijtimoiy suhbat (2 kishi)
+     IELTS Listening Part 1: kundalik hayot mavzusi
+     ═══════════════════════════════════════════════════════════ -->
+<div class="ml-section"
+     data-title="Section 1 — Accommodation Enquiry"
+     data-description="You will hear a student telephoning a housing office to enquire about accommodation. First you have some time to look at Questions 1–10. Now listen carefully and answer the questions.">
+
+  <!-- Questions 1–5: Form Completion (fill) -->
+  <div class="ml-question" data-number="1" data-type="fill" data-answer="Wednesday">
+    <p class="ml-text">The housing office is open Monday to ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="2" data-type="fill" data-answer="325">
+    <p class="ml-text">The student's reference number is ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="3" data-type="fill" data-answer="Green Park">
+    <p class="ml-text">The accommodation is located near ______ underground station.</p>
+  </div>
+
+  <div class="ml-question" data-number="4" data-type="fill" data-answer="550">
+    <p class="ml-text">The monthly rent for a single room is £______.</p>
+  </div>
+
+  <div class="ml-question" data-number="5" data-type="fill" data-answer="6 weeks">
+    <p class="ml-text">The minimum tenancy period is ______.</p>
+  </div>
+
+  <!-- Questions 6–8: Multiple Choice (mcq) -->
+  <div class="ml-question" data-number="6" data-type="mcq" data-answer="B">
+    <p class="ml-text">What type of room does the student prefer?</p>
+    <p class="ml-option-a">A shared room with other students</p>
+    <p class="ml-option-b">A single room with a private bathroom</p>
+    <p class="ml-option-c">A studio apartment with a kitchen</p>
+  </div>
+
+  <div class="ml-question" data-number="7" data-type="mcq" data-answer="C">
+    <p class="ml-text">Which facility is NOT included in the rent?</p>
+    <p class="ml-option-a">Internet access</p>
+    <p class="ml-option-b">Central heating</p>
+    <p class="ml-option-c">Parking space</p>
+  </div>
+
+  <div class="ml-question" data-number="8" data-type="mcq" data-answer="A">
+    <p class="ml-text">When can the student move in?</p>
+    <p class="ml-option-a">At the start of next month</p>
+    <p class="ml-option-b">In two weeks' time</p>
+    <p class="ml-option-c">Immediately</p>
+  </div>
+
+  <!-- Questions 9–10: Note Completion (fill) -->
+  <div class="ml-question" data-number="9" data-type="fill" data-answer="passport">
+    <p class="ml-text">The student must bring a ______ when signing the tenancy contract.</p>
+  </div>
+
+  <div class="ml-question" data-number="10" data-type="fill" data-answer="johnson@campus.ac.uk">
+    <p class="ml-text">The housing officer's email address is ______.</p>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     TO'LIQ TEST MISOLI (4 ta section)
+     "Full Test" rejimda import qilganda quyidagilar ham qo'shiladi.
+     "Single Part" rejimda faqat birinchi ml-section olinadi.
+     ═══════════════════════════════════════════════════════════
+
+<div class="ml-section"
+     data-title="Section 2 — City Facilities Tour"
+     data-description="You will hear a guide talking about local facilities available to new residents of Greenfield. Listen and answer Questions 11-20.">
+
+  <div class="ml-question" data-number="11" data-type="fill" data-answer="library">
+    <p class="ml-text">The nearest ______ is a five-minute walk from the town centre.</p>
+  </div>
+
+  <div class="ml-question" data-number="12" data-type="fill" data-answer="Thursday">
+    <p class="ml-text">The weekly market takes place every ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="13" data-type="fill" data-answer="swimming pool">
+    <p class="ml-text">The leisure centre includes a gym and a ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="14" data-type="mcq" data-answer="B">
+    <p class="ml-text">How much does a monthly bus pass cost?</p>
+    <p class="ml-option-a">£30</p>
+    <p class="ml-option-b">£45</p>
+    <p class="ml-option-c">£60</p>
+  </div>
+
+  ... (11-20 savollar)
+</div>
+
+<div class="ml-section"
+     data-title="Section 3 — University Project Discussion"
+     data-description="You will hear two students discussing their research project on renewable energy. Listen and answer Questions 21-30.">
+
+  ... (21-30 savollar)
+</div>
+
+<div class="ml-section"
+     data-title="Section 4 — Lecture: Marine Biology"
+     data-description="You will hear part of a university lecture about deep-sea creatures. Listen and answer Questions 31-40.">
+
+  ... (31-40 savollar)
+</div>
+-->
+
+</body>
+</html>

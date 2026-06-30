@@ -19,6 +19,7 @@ class ListeningSection(models.Model):
     title = models.CharField(max_length=200)
     transcript = models.TextField(blank=True)
     description = models.TextField(blank=True)
+    audio_file = models.FileField(upload_to='listening/sections/', null=True, blank=True)
 
     class Meta:
         ordering = ['order']
