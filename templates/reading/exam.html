@@ -5,9 +5,8 @@
 {% block extra_head %}
 <style>
 /* ── Layout ─────────────────────────────────────────────── */
-#exam-wrap   { display:flex;flex-direction:column;height:100vh;background:var(--bg); }
-#exam-body   { flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden; }
-.exam-pane   { overflow-y:auto;overflow-x:hidden; }
+#exam-wrap { display:flex;flex-direction:column;height:100dvh;background:var(--bg); }
+.exam-pane { overflow-y:auto;overflow-x:hidden; }
 
 /* ── Passage tabs ───────────────────────────────────────── */
 .ptab        { padding:0 18px;height:40px;border:none;border-bottom:2px solid transparent;
@@ -16,9 +15,16 @@
 .ptab.active { color:var(--ink);border-bottom-color:var(--ink);font-weight:600; }
 
 /* ── Passage text ───────────────────────────────────────── */
-.passage-body { font-size:15px;line-height:1.85;color:var(--ink);font-family:inherit; }
-.passage-body p { margin-bottom:1.2em; }
+.passage-body { font-size:17px;line-height:2.0;color:var(--ink);
+                font-family:'Newsreader',Georgia,serif;letter-spacing:-.008em; }
+.passage-body p { margin-bottom:1.5em;text-align:justify;hyphens:auto; }
 .passage-body p:last-child { margin-bottom:0; }
+
+/* ── Font size control buttons ──────────────────────────── */
+.fs-btn { padding:2px 9px;border-radius:6px;border:1px solid var(--border);
+           background:transparent;cursor:pointer;font-family:'Geist Mono',monospace;
+           font-size:11px;font-weight:600;color:var(--muted);transition:all .12s; }
+.fs-btn:hover { background:var(--surface-2);color:var(--ink); }
 
 /* ── Highlights ─────────────────────────────────────────── */
 .hl           { border-radius:2px;cursor:pointer; }
@@ -65,18 +71,46 @@
 {% block body %}
 <div id="exam-wrap">
 
-  <!-- ── Top bar ─────────────────────────────────────────────────── -->
-  <div class="flex items-center gap-4 px-5 border-b flex-shrink-0"
-       style="height:52px;background:var(--bg-2);border-color:var(--border);">
-    <a href="/" class="ml-mark" style="text-decoration:none;font-size:15px;">MockLeap</a>
-    <div class="flex-1 text-sm font-medium truncate" style="color:var(--ink-2);">{{ test.title }}</div>
-    <div class="flex items-center gap-3 flex-shrink-0">
-      <span style="font-size:12px;color:var(--muted);">Reading</span>
-      <span id="timer" class="tnum text-sm font-semibold"
-            style="font-family:'Geist Mono',monospace;color:var(--ink);">
-        {{ test.duration_minutes }}:00
-      </span>
-      <button type="submit" form="exam-form" class="ml-btn ml-btn-primary ml-btn-sm">Submit</button>
+  <!-- ── Top bar (IELTS dark style) ───────────────────────────────── -->
+  <div id="exam-topbar-glass">
+    <a href="/" style="text-decoration:none;flex-shrink:0;">
+      <span style="font-size:14px;font-weight:700;letter-spacing:-.02em;color:rgba(250,246,236,.95);">MockLeap</span>
+    </a>
+    <div style="width:1px;height:22px;background:rgba(250,246,236,.18);flex-shrink:0;"></div>
+    <span class="exam-module">Reading</span>
+    <div class="exam-title">{{ test.title }}</div>
+
+    <!-- Font size + highlight + fullscreen controls -->
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      <button class="tb-btn" onclick="changeFontSize(-1)" title="Decrease font size" style="font-size:11px;font-weight:700;">A−</button>
+      <button class="tb-btn" onclick="changeFontSize(0)"  title="Reset font size"    style="font-size:10px;">↺</button>
+      <button class="tb-btn" onclick="changeFontSize(1)"  title="Increase font size" style="font-size:12px;font-weight:700;">A+</button>
+      <div style="width:1px;height:16px;background:rgba(250,246,236,.18);margin:0 2px;"></div>
+      <button class="tb-btn" id="hl-toggle-btn" onclick="toggleHlMode()" title="Highlight">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path d="M2 12l2.5-2.5 7-7 2 2-7 7L2 14v-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div style="width:1px;height:16px;background:rgba(250,246,236,.18);margin:0 2px;"></div>
+      <button class="tb-btn" id="fs-toggle-btn" onclick="toggleFullscreen()" title="Full screen">
+        <svg id="fs-ico-expand" width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path d="M1 1h4M1 1v4M15 1h-4M15 1v4M1 15h4M1 15v-4M15 15h-4M15 15v-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <svg id="fs-ico-compress" width="13" height="13" viewBox="0 0 16 16" fill="none" style="display:none;">
+          <path d="M5 1v4H1M11 1v4h4M5 15v-4H1M11 15v-4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:rgba(250,246,236,.55);">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span id="timer">{{ test.duration_minutes }}:00</span>
+      </div>
+      <button type="submit" form="exam-form" class="exam-submit">Submit</button>
     </div>
   </div>
 
@@ -90,14 +124,15 @@
   </div>
 
   <!-- ── Main split: passage | questions ────────────────────────── -->
-  <div id="exam-body">
+  <div id="exam-body" style="flex:1;display:grid;grid-template-columns:50% 4px 1fr;grid-template-rows:1fr;overflow:hidden;min-height:0;height:0;">
 
     <!-- LEFT: passage -->
-    <div class="exam-pane border-r" style="border-color:var(--border);">
+    <div class="exam-pane" id="passage-pane"
+         style="border-right:none;min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden;">
 
-      <!-- Passage tabs + highlight hint -->
+      <!-- Passage tabs + controls -->
       <div class="flex items-center border-b flex-shrink-0 px-2"
-           style="background:var(--bg-2);border-color:var(--border);gap:0;">
+           style="background:var(--bg-2);border-color:var(--border);gap:0;min-height:44px;">
         {% for passage in passages %}
         <button class="ptab {% if forloop.first %}active{% endif %}"
                 id="ptab-{{ passage.order }}"
@@ -105,26 +140,26 @@
           Passage {{ passage.order }}
         </button>
         {% endfor %}
-        <div class="ml-auto flex items-center gap-1 pr-3" style="font-size:11px;color:var(--muted);">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
-            <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M5 8h6M5 5h6M5 11h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-          </svg>
-          Select text to highlight
-        </div>
       </div>
 
       <!-- Passage content areas -->
       {% for passage in passages %}
       <div id="passage-{{ passage.order }}"
            class="passage-zone"
-           style="{% if not forloop.first %}display:none;{% endif %}padding:28px 32px 40px;">
-        <div class="t-eyebrow mb-1" style="color:var(--muted);">Passage {{ passage.order }}</div>
-        <h2 style="font-size:21px;font-weight:700;color:var(--ink);margin-bottom:20px;line-height:1.3;">
+           style="{% if not forloop.first %}display:none;{% endif %}padding:28px 40px 56px;">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+                    color:var(--muted);margin-bottom:6px;">Passage {{ passage.order }}</div>
+        <h2 style="font-family:'Newsreader',Georgia,serif;font-size:22px;font-weight:700;
+                   color:var(--ink);margin-bottom:8px;line-height:1.3;">
           {{ passage.title }}
         </h2>
         {% if passage.source %}
-        <div class="t-meta mb-4" style="font-size:12px;">Source: {{ passage.source }}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:24px;padding-bottom:16px;
+                    border-bottom:1px solid var(--border);">
+          Source: <em>{{ passage.source }}</em>
+        </div>
+        {% else %}
+        <div style="height:20px;"></div>
         {% endif %}
         <div class="passage-body" id="ptext-{{ passage.order }}">
           {% for para in passage.paragraphs %}
@@ -135,72 +170,97 @@
       {% endfor %}
     </div>
 
+    <!-- RESIZE HANDLE -->
+    <div id="exam-resizer" style="background:var(--border);cursor:col-resize;position:relative;z-index:2;">
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+                  width:4px;height:48px;border-radius:4px;background:var(--border-2);
+                  transition:background .15s;" id="resizer-grip"></div>
+    </div>
+
     <!-- RIGHT: questions -->
-    <div class="exam-pane" style="padding:24px 28px 48px;">
-      <form id="exam-form" method="post" action="{% url 'reading:submit' attempt.pk %}">
+    <div class="exam-pane" id="question-pane" style="min-width:0;min-height:0;overflow-y:auto;overflow-x:hidden;background:var(--bg-2);padding:0;">
+      <form id="exam-form" method="post" action="{% url 'reading:submit' attempt.pk %}"
+            style="padding:20px 24px 80px;">
         {% csrf_token %}
 
         {% for passage in passages %}
-        <!-- Passage header in questions pane -->
-        <div class="q-passage-hdr" id="qsec-{{ passage.order }}">
+        <!-- Passage section header -->
+        <div id="qsec-{{ passage.order }}"
+             style="display:flex;align-items:center;gap:10px;
+                    padding:12px 0 10px;margin-bottom:18px;
+                    border-bottom:2px solid var(--border);
+                    {% if not forloop.first %}margin-top:32px;{% endif %}">
           <button type="button" onclick="switchPassage({{ passage.order }})"
-                  style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+                  style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
                          padding:3px 10px;border-radius:6px;border:1px solid var(--border);
-                         background:var(--surface-2);color:var(--muted);cursor:pointer;">
-            Passage {{ passage.order }}
+                         background:var(--surface-2);color:var(--muted);cursor:pointer;flex-shrink:0;">
+            P{{ passage.order }}
           </button>
-          <span style="font-size:13px;font-weight:600;color:var(--ink);">{{ passage.title }}</span>
+          <span style="font-size:13px;font-weight:600;color:var(--ink);
+                       overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+            {{ passage.title }}
+          </span>
         </div>
 
         {% for group in passage.question_groups.all %}
-        <div class="mb-8">
-          <div class="t-eyebrow mb-1" style="color:var(--muted);">{{ group.get_question_type_display }}</div>
-          {% if group.instructions %}
-          <p style="font-size:13px;color:var(--ink-2);margin-bottom:14px;line-height:1.6;font-style:italic;
-                    padding:10px 14px;border-radius:8px;background:var(--surface-2);">
-            {{ group.instructions }}
-          </p>
-          {% endif %}
+        <div style="margin-bottom:28px;">
 
+          <!-- Group header -->
+          <div class="q-group-header">
+            <div class="q-group-type">{{ group.get_question_type_display }}</div>
+            {% if group.instructions %}
+            <div class="q-group-instructions">{{ group.instructions }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Questions -->
           {% for question in group.questions.all %}
-          <div class="flex gap-3 mb-5">
-            <span class="q-num flex-shrink-0">{{ question.number }}</span>
-            <div style="flex:1;">
-              <p style="font-size:14px;color:var(--ink);margin-bottom:10px;line-height:1.6;">
-                {{ question.text }}
-              </p>
+          <div style="display:flex;gap:12px;padding:14px 0;
+                      border-bottom:1px solid var(--border);align-items:flex-start;">
+            <span class="q-num">{{ question.number }}</span>
+            <div style="flex:1;min-width:0;">
+              <p class="q-text" data-qhl="qtext-{{ question.pk }}">{{ question.text }}</p>
 
               {% if group.question_type == 'mcq' %}
+                <div style="display:flex;flex-direction:column;gap:7px;">
                 {% for letter, opt_text in question.choices %}
-                <label class="q-label"
-                       onmouseover="this.style.background='var(--surface-2)'"
-                       onmouseout="if(!this.querySelector('input').checked)this.style.background='transparent'">
-                  <input type="radio" name="q{{ question.pk }}" value="{{ letter }}"
-                         style="margin-top:2px;accent-color:var(--ink);flex-shrink:0;">
-                  <span style="font-size:14px;color:var(--ink);">
-                    <b style="color:var(--ink-2);">{{ letter }}.</b>&nbsp;{{ opt_text }}
+                <label class="q-label">
+                  <input type="radio" name="q{{ question.pk }}" value="{{ letter }}">
+                  <span>
+                    <b style="font-weight:700;margin-right:5px;color:var(--ink-2);">{{ letter }}</b>{{ opt_text }}
                   </span>
                 </label>
                 {% endfor %}
+                </div>
 
               {% elif group.question_type == 'tfng' %}
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   {% for val in tfng_values %}
-                  <label style="display:flex;align-items:center;gap:6px;padding:6px 14px;
-                                border-radius:8px;border:1px solid var(--border);cursor:pointer;
-                                font-size:13px;font-weight:500;color:var(--ink-2);transition:background .1s;"
-                         onmouseover="this.style.background='var(--surface-2)'"
-                         onmouseout="this.style.background='transparent'">
+                  <label class="tfng-btn">
                     <input type="radio" name="q{{ question.pk }}" value="{{ val }}"
-                           style="accent-color:var(--ink);">
+                           style="position:absolute;opacity:0;pointer-events:none;"
+                           onchange="(function(inp){
+                             document.querySelectorAll('[name=\'q{{ question.pk }}\']').forEach(r=>{
+                               r.closest('label').classList.remove('selected');
+                             });
+                             inp.closest('label').classList.add('selected');
+                           })(this)">
                     {{ val }}
                   </label>
                   {% endfor %}
                 </div>
 
               {% else %}
-                <input type="text" name="q{{ question.pk }}" class="ml-input"
-                       style="max-width:280px;font-size:14px;" placeholder="Write your answer">
+                <div class="q-fill-wrap">
+                  <input type="text" name="q{{ question.pk }}" class="ml-input"
+                         style="font-size:14px;"
+                         placeholder="Your answer…"
+                         autocomplete="off" autocorrect="off" spellcheck="false">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 12l2.5-2.5L12 2l2 2-7.5 7.5L2 14v-2z"
+                          stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                  </svg>
+                </div>
               {% endif %}
             </div>
           </div>
@@ -211,7 +271,7 @@
         {% endfor %}
 
         <button type="submit" class="ml-btn ml-btn-primary ml-btn-lg"
-                style="width:100%;margin-top:8px;">Submit exam</button>
+                style="width:100%;margin-top:24px;">Submit Reading Exam</button>
       </form>
     </div>
 
@@ -247,29 +307,24 @@ function switchPassage(n) {
   restoreHighlights(n);
 }
 
-// ── Highlighting ──────────────────────────────────────────────────
+// ── Highlighting (passage + questions) ───────────────────────────
 const STORAGE_KEY = 'hl-{{ attempt.pk }}';
-let pendingColor = null;
-const toolbar    = document.getElementById('hl-toolbar');
+const toolbar     = document.getElementById('hl-toolbar');
 
-// Show toolbar when user selects text inside a passage
+// Any highlightable zone: passage text OR question text
+function getHighlightZone(node) {
+  const el = node?.parentElement;
+  return el?.closest('.passage-body') || el?.closest('.q-text') || null;
+}
+
 document.addEventListener('mouseup', (e) => {
-  // Clicked inside the toolbar itself — don't hide
   if (toolbar.contains(e.target)) return;
-
   const sel = window.getSelection();
-  if (!sel || sel.isCollapsed || sel.toString().trim() === '') {
-    hideToolbar();
-    return;
-  }
-  // Check selection is inside a passage text zone
-  const anchor = sel.anchorNode;
-  const inPassage = !!anchor?.parentElement?.closest('.passage-body');
-  if (!inPassage) { hideToolbar(); return; }
-
-  const range = sel.getRangeAt(0);
-  const rect  = range.getBoundingClientRect();
-  showToolbar(rect.left + rect.width / 2, rect.top + window.scrollY - 44);
+  if (!sel || sel.isCollapsed || !sel.toString().trim()) { hideToolbar(); return; }
+  const zone = getHighlightZone(sel.anchorNode);
+  if (!zone) { hideToolbar(); return; }
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  showToolbar(rect.left + rect.width / 2, rect.top + window.scrollY - 50);
 });
 
 document.addEventListener('mousedown', (e) => {
@@ -278,64 +333,66 @@ document.addEventListener('mousedown', (e) => {
 
 function showToolbar(x, y) {
   toolbar.style.display = 'flex';
-  toolbar.style.left    = Math.max(8, x - 80) + 'px';
-  toolbar.style.top     = y + 'px';
+  const tw = 200;
+  toolbar.style.left = Math.max(8, Math.min(window.innerWidth - tw - 8, x - tw/2)) + 'px';
+  toolbar.style.top  = Math.max(8, y) + 'px';
 }
-function hideToolbar() {
-  toolbar.style.display = 'none';
-}
+function hideToolbar() { toolbar.style.display = 'none'; }
 
 function applyHighlight(colorClass) {
   const sel = window.getSelection();
   if (!sel || sel.isCollapsed) return;
-
   const range = sel.getRangeAt(0);
-  const passageEl = range.commonAncestorContainer?.parentElement?.closest('.passage-body')
-                 || range.startContainer?.parentElement?.closest('.passage-body');
-  if (!passageEl) return;
+  const zone  = getHighlightZone(range.startContainer)
+             || getHighlightZone(range.commonAncestorContainer);
+  if (!zone) return;
 
   const span = document.createElement('span');
   span.className = 'hl ' + colorClass;
-  span.title = 'Click to remove highlight';
-
+  span.title = 'Click to remove';
   try {
     range.surroundContents(span);
   } catch (_) {
-    // Selection spans element boundaries — extract and re-insert
     const frag = range.extractContents();
     span.appendChild(frag);
     range.insertNode(span);
   }
-
-  // Remove-on-click
-  span.addEventListener('click', function () {
-    const parent = this.parentNode;
-    while (this.firstChild) parent.insertBefore(this.firstChild, this);
-    parent.removeChild(this);
-    saveHighlights();
-  });
-
+  attachRemoveHandler(span);
   sel.removeAllRanges();
   hideToolbar();
   saveHighlights();
 }
 
+function attachRemoveHandler(span) {
+  span.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const p = this.parentNode;
+    while (this.firstChild) p.insertBefore(this.firstChild, this);
+    p.removeChild(this);
+    saveHighlights();
+  });
+}
+
 function clearHighlights() {
   document.querySelectorAll('.hl').forEach(span => {
-    const parent = span.parentNode;
-    while (span.firstChild) parent.insertBefore(span.firstChild, span);
-    parent.removeChild(span);
+    const p = span.parentNode;
+    while (span.firstChild) p.insertBefore(span.firstChild, span);
+    p.removeChild(span);
   });
-  localStorage.removeItem(STORAGE_KEY);
+  try { localStorage.removeItem(STORAGE_KEY); } catch(_) {}
   hideToolbar();
 }
 
-// ── Persist highlights via localStorage ───────────────────────────
+// ── Persist highlights ─────────────────────────────────────────────
 function saveHighlights() {
   const data = {};
+  // Passage text zones
   document.querySelectorAll('.passage-body').forEach(el => {
-    const pid = el.id; // ptext-1, ptext-2, ...
-    data[pid] = el.innerHTML;
+    data[el.id] = el.innerHTML;
+  });
+  // Question text zones
+  document.querySelectorAll('.q-text[data-qhl]').forEach(el => {
+    data[el.dataset.qhl] = el.innerHTML;
   });
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(_) {}
 }
@@ -345,24 +402,170 @@ function restoreHighlights(passageOrder) {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const data = JSON.parse(raw);
-    const pid  = 'ptext-' + passageOrder;
-    const el   = document.getElementById(pid);
-    if (el && data[pid]) {
-      el.innerHTML = data[pid];
-      // Re-attach click handlers for restored highlights
-      el.querySelectorAll('.hl').forEach(span => {
-        span.addEventListener('click', function () {
-          const parent = this.parentNode;
-          while (this.firstChild) parent.insertBefore(this.firstChild, this);
-          parent.removeChild(this);
-          saveHighlights();
-        });
-      });
+    // Restore passage
+    const pid = 'ptext-' + passageOrder;
+    const pel = document.getElementById(pid);
+    if (pel && data[pid]) {
+      pel.innerHTML = data[pid];
+      pel.querySelectorAll('.hl').forEach(attachRemoveHandler);
     }
+    // Restore questions
+    document.querySelectorAll('.q-text[data-qhl]').forEach(el => {
+      const key = el.dataset.qhl;
+      if (data[key]) {
+        el.innerHTML = data[key];
+        el.querySelectorAll('.hl').forEach(attachRemoveHandler);
+      }
+    });
   } catch(_) {}
 }
 
-// ── Init: restore highlights for the first passage ────────────────
+// ── Init ──────────────────────────────────────────────────────────
 restoreHighlights(1);
+
+// ── Font size control ─────────────────────────────────────────────
+const FS_KEY = 'ml-reading-fs';
+const FS_SIZES = [14, 15, 16, 17, 18, 19, 20, 22];
+const FS_DEFAULT = 17;
+let fsCurrent = parseInt(localStorage.getItem(FS_KEY) || FS_DEFAULT);
+
+function applyFontSize(size) {
+  const lhPassage = size >= 20 ? '2.2' : size >= 18 ? '2.0' : size <= 14 ? '1.8' : '1.95';
+  const qSize     = Math.max(13, size - 1);   // questions 1px smaller than passage
+  const lhQ       = size >= 20 ? '2.0' : '1.85';
+  const optSize   = Math.max(13, size - 2);   // MCQ options 2px smaller
+
+  document.querySelectorAll('.passage-body').forEach(el => {
+    el.style.setProperty('font-size',   size + 'px', 'important');
+    el.style.setProperty('line-height', lhPassage,    'important');
+  });
+  document.querySelectorAll('.q-text').forEach(el => {
+    el.style.setProperty('font-size',   qSize + 'px', 'important');
+    el.style.setProperty('line-height', lhQ,           'important');
+  });
+  document.querySelectorAll('.q-label span').forEach(el => {
+    el.style.setProperty('font-size', optSize + 'px', 'important');
+  });
+  try { localStorage.setItem(FS_KEY, size); } catch(_) {}
+}
+
+function changeFontSize(dir) {
+  if (dir === 0) { fsCurrent = FS_DEFAULT; }
+  else {
+    const idx = FS_SIZES.indexOf(fsCurrent);
+    const next = idx + dir;
+    if (next < 0 || next >= FS_SIZES.length) return;
+    fsCurrent = FS_SIZES[next];
+  }
+  applyFontSize(fsCurrent);
+}
+
+// Apply saved font size on load
+applyFontSize(fsCurrent);
+
+// ── Fullscreen toggle ──────────────────────────────────────────
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const full = !!document.fullscreenElement;
+  document.getElementById('fs-ico-expand').style.display   = full ? 'none' : '';
+  document.getElementById('fs-ico-compress').style.display = full ? '' : 'none';
+});
+
+// ── Highlight mode toggle (topbar button) ──────────────────────
+function toggleHlMode() {
+  const btn = document.getElementById('hl-toggle-btn');
+  const isActive = btn.dataset.active === '1';
+  if (isActive) {
+    btn.dataset.active = '0';
+    btn.style.background = '';
+    btn.style.color = '';
+  } else {
+    btn.dataset.active = '1';
+    btn.style.background = 'rgba(250,246,236,.20)';
+    btn.style.color = '#fef08a';
+    // Show highlight toolbar briefly as hint
+    const tb = document.getElementById('hl-toolbar');
+    if (tb) { tb.style.opacity = '1'; tb.style.pointerEvents = 'auto'; }
+  }
+}
+
+// ── Timer warning colors ──────────────────────────────────────────
+(function() {
+  const timerEl = document.getElementById('timer');
+  const obs = new MutationObserver(() => {
+    const txt = timerEl.textContent.trim();
+    const parts = txt.split(':');
+    const totalSec = (parseInt(parts[0])||0)*60 + (parseInt(parts[1])||0);
+    if (totalSec <= 300) timerEl.className = 'timer-danger';
+    else if (totalSec <= 600) timerEl.className = 'timer-warn';
+    else timerEl.className = '';
+  });
+  if (timerEl) obs.observe(timerEl, {childList:true, subtree:true, characterData:true});
+})();
+
+// ── Resizable split pane (grid-based) ────────────────────────────
+(function() {
+  const grip   = document.getElementById('exam-resizer');
+  const grid   = document.getElementById('exam-body');
+  if (!grip || !grid) return;
+
+  const KEY = 'ml-split-v3';
+  const RISER_W = 4; // px — must match grid-template-columns middle value
+
+  function setPct(pct) {
+    const c = Math.min(75, Math.max(25, pct));
+    grid.style.gridTemplateColumns = c + '% ' + RISER_W + 'px 1fr';
+    return c;
+  }
+
+  // Restore saved split
+  const saved = parseFloat(localStorage.getItem(KEY));
+  setPct(saved >= 25 && saved <= 75 ? saved : 50);
+
+  let drag = false, sx = 0, sw = 0, tw = 0;
+  const grip2 = document.getElementById('resizer-grip');
+
+  function startDrag(clientX) {
+    drag = true; sx = clientX;
+    const cols = grid.style.gridTemplateColumns;
+    const leftPx = parseFloat(cols); // first value in px when resolved by browser
+    sw = grid.querySelector('#passage-pane').getBoundingClientRect().width;
+    tw = grid.getBoundingClientRect().width;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    if (grip2) grip2.style.background = 'var(--ink-2)';
+  }
+
+  function moveDrag(clientX) {
+    if (!drag) return;
+    setPct((sw + clientX - sx) / tw * 100);
+  }
+
+  function endDrag() {
+    if (!drag) return;
+    drag = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    if (grip2) grip2.style.background = 'var(--border-2)';
+    const cur = parseFloat(grid.style.gridTemplateColumns);
+    const pct = grid.querySelector('#passage-pane').getBoundingClientRect().width
+                / grid.getBoundingClientRect().width * 100;
+    try { localStorage.setItem(KEY, pct.toFixed(1)); } catch(_) {}
+  }
+
+  grip.addEventListener('mousedown', e => { startDrag(e.clientX); e.preventDefault(); });
+  document.addEventListener('mousemove', e => moveDrag(e.clientX));
+  document.addEventListener('mouseup', endDrag);
+
+  grip.addEventListener('touchstart', e => { startDrag(e.touches[0].clientX); e.preventDefault(); }, {passive:false});
+  document.addEventListener('touchmove', e => { if(drag) moveDrag(e.touches[0].clientX); }, {passive:true});
+  document.addEventListener('touchend', endDrag);
+})();
 </script>
 {% endblock %}

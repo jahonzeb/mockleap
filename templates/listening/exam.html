@@ -2,18 +2,90 @@
 {% load static ml_extras %}
 {% block title %}{{ test.title }} — Listening Exam{% endblock %}
 
-{% block body %}
-<div class="flex flex-col" style="height:100vh;background:var(--bg);">
+{% block extra_head %}
+<style>
+.hl        { border-radius:2px; cursor:pointer; }
+.hl-yellow { background:#FDE68A; }
+.hl-green  { background:#BBF7D0; }
+.hl-blue   { background:#BFDBFE; }
+.hl-pink   { background:#FECDD3; }
 
-  <!-- Top bar -->
-  <div class="flex items-center gap-4 px-6 border-b flex-shrink-0"
-       style="height:56px;background:var(--bg-2);border-color:var(--border);">
-    <a href="/" class="ml-mark" style="text-decoration:none;font-size:16px;">MockLeap</a>
-    <div class="flex-1 text-sm font-medium truncate" style="color:var(--ink-2);">{{ test.title }}</div>
-    <div class="flex items-center gap-4 flex-shrink-0">
-      <span id="timer" class="tnum text-sm font-semibold"
-            style="font-family:'Geist Mono',monospace;color:var(--ink);">--:--</span>
-      <button type="submit" form="exam-form" class="ml-btn ml-btn-primary ml-btn-sm">Submit all</button>
+#hl-toolbar-ls {
+  position:fixed; z-index:200;
+  display:none; align-items:center; gap:4px;
+  padding:5px 8px;
+  background:var(--bg-2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.14);
+}
+#hl-toolbar-ls button {
+  width:22px; height:22px; border-radius:50%;
+  border:2px solid transparent; cursor:pointer;
+  transition:transform .1s, border-color .1s;
+}
+#hl-toolbar-ls button:hover { transform:scale(1.18); border-color:var(--ink); }
+#hl-erase-ls {
+  width:auto!important; height:22px!important;
+  border-radius:6px!important; padding:0 8px;
+  font-size:11px; font-weight:600;
+  background:var(--surface-2); color:var(--muted); border:1px solid var(--border)!important;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Listening highlight toolbar -->
+<div id="hl-toolbar-ls">
+  <button title="Yellow" onclick="lsHL('hl-yellow')" style="background:#FDE68A;"></button>
+  <button title="Green"  onclick="lsHL('hl-green')"  style="background:#BBF7D0;"></button>
+  <button title="Blue"   onclick="lsHL('hl-blue')"   style="background:#BFDBFE;"></button>
+  <button title="Pink"   onclick="lsHL('hl-pink')"   style="background:#FECDD3;"></button>
+  <button id="hl-erase-ls" onclick="lsClear()">Clear</button>
+</div>
+
+<div class="flex flex-col" style="height:100dvh;background:var(--bg);">
+
+  <!-- Top bar (IELTS dark style) -->
+  <div id="exam-topbar-glass">
+    <a href="/" style="text-decoration:none;flex-shrink:0;">
+      <span style="font-size:14px;font-weight:700;letter-spacing:-.02em;color:rgba(250,246,236,.95);">MockLeap</span>
+    </a>
+    <div style="width:1px;height:22px;background:rgba(250,246,236,.18);flex-shrink:0;"></div>
+    <span class="exam-module">Listening</span>
+    <div class="exam-title">{{ test.title }}</div>
+
+    <!-- Font size + highlight + fullscreen controls -->
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+      <button class="tb-btn" onclick="lsChangeFontSize(-1)" title="Decrease font size" style="font-size:11px;font-weight:700;">A−</button>
+      <button class="tb-btn" onclick="lsChangeFontSize(0)"  title="Reset font size"    style="font-size:10px;">↺</button>
+      <button class="tb-btn" onclick="lsChangeFontSize(1)"  title="Increase font size" style="font-size:12px;font-weight:700;">A+</button>
+      <div style="width:1px;height:16px;background:rgba(250,246,236,.18);margin:0 2px;"></div>
+      <button class="tb-btn" id="hl-toggle-btn-ls" onclick="toggleHlModeLS()" title="Highlight">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path d="M2 12l2.5-2.5 7-7 2 2-7 7L2 14v-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div style="width:1px;height:16px;background:rgba(250,246,236,.18);margin:0 2px;"></div>
+      <button class="tb-btn" id="fs-toggle-btn-ls" onclick="toggleFullscreenLS()" title="Full screen">
+        <svg id="fs-ico-expand-ls" width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path d="M1 1h4M1 1v4M15 1h-4M15 1v4M1 15h4M1 15v-4M15 15h-4M15 15v-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <svg id="fs-ico-compress-ls" width="13" height="13" viewBox="0 0 16 16" fill="none" style="display:none;">
+          <path d="M5 1v4H1M11 1v4h4M5 15v-4H1M11 15v-4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="color:rgba(250,246,236,.55);">
+          <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span id="timer">--:--</span>
+      </div>
+      <button type="submit" form="exam-form" class="exam-submit">Submit all</button>
     </div>
   </div>
 
@@ -34,12 +106,9 @@
         <svg id="ico-play" width="13" height="13" viewBox="0 0 16 16" fill="white">
           <path d="M5 3.5l9 4.5-9 4.5V3.5z"/>
         </svg>
-        <!-- playing: 3 animated bars -->
-        <span id="ico-bars"
-              style="display:none;flex-direction:row;align-items:flex-end;gap:2px;height:13px;">
-          <span style="display:block;width:3px;height:4px;border-radius:2px;background:white;animation:ml-bar1 .8s ease infinite;"></span>
-          <span style="display:block;width:3px;height:8px;border-radius:2px;background:white;animation:ml-bar2 .8s ease infinite;"></span>
-          <span style="display:block;width:3px;height:5px;border-radius:2px;background:white;animation:ml-bar3 .8s ease infinite;"></span>
+        <!-- playing: 5-bar waveform animation -->
+        <span id="ico-bars" class="ml-waveform" style="display:none;">
+          <span></span><span></span><span></span><span></span><span></span>
         </span>
         <!-- ended: checkmark -->
         <svg id="ico-done" width="13" height="13" viewBox="0 0 16 16" fill="none" style="display:none;">
@@ -108,14 +177,12 @@
   </div>
 
   <!-- Section tabs -->
-  <div class="flex border-b flex-shrink-0 px-4"
-       style="background:var(--bg-2);border-color:var(--border);gap:2px;overflow-x:auto;">
+  <div style="display:flex;align-items:center;border-bottom:1px solid var(--border);
+              background:var(--bg-2);padding:0 16px;gap:0;overflow-x:auto;flex-shrink:0;">
     {% for section in test.sections.all %}
     <button type="button" id="tab-{{ forloop.counter0 }}"
             onclick="mlSwitchSection({{ forloop.counter0 }})"
-            style="padding:0 16px;height:42px;border:none;border-bottom:2px solid transparent;
-                   background:transparent;font-size:13px;font-weight:500;cursor:pointer;
-                   color:var(--muted);transition:color .12s,border-color .12s;white-space:nowrap;flex-shrink:0;">
+            class="ptab {% if forloop.first %}active{% endif %}">
       Section {{ section.order }}
     </button>
     {% endfor %}
@@ -128,44 +195,55 @@
 
     {% for section in test.sections.all %}
     <div id="section-{{ forloop.counter0 }}" class="exam-section"
-         style="{% if not forloop.first %}display:none;{% endif %}padding:32px 32px 48px;">
-      <div style="max-width:720px;margin:0 auto;">
+         style="{% if not forloop.first %}display:none;{% endif %}padding:28px 32px 56px;">
+      <div style="max-width:740px;margin:0 auto;">
 
         <!-- Section header -->
-        <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:8px;margin-bottom:24px;">
-          <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-                       color:var(--muted);flex-shrink:0;">Section {{ section.order }}</span>
-          <span style="font-size:15px;font-weight:600;color:var(--ink);">{{ section.title }}</span>
+        <div style="margin-bottom:24px;">
+          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+                      color:var(--muted);margin-bottom:4px;">Section {{ section.order }}</div>
+          <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:{% if section.description %}10px{% else %}0{% endif %};">
+            {{ section.title }}
+          </div>
           {% if section.description %}
-          <span style="font-size:13px;color:var(--muted);">— {{ section.description }}</span>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.65;
+                      padding:12px 16px;border-radius:10px;background:var(--surface-2);
+                      border-left:3px solid var(--accent);">
+            {{ section.description }}
+          </div>
           {% endif %}
         </div>
 
         <!-- Questions -->
         {% for question in section.questions.all %}
-        <div class="flex gap-4 mb-7">
-          <span class="q-num flex-shrink-0">{{ question.number }}</span>
+        <div style="display:flex;gap:12px;padding:14px 0;
+                    border-bottom:1px solid var(--border);align-items:flex-start;">
+          <span class="q-num">{{ question.number }}</span>
           <div style="flex:1;min-width:0;">
-            <p class="t-body text-sm mb-3" style="color:var(--ink);">{{ question.text }}</p>
+            <p class="q-text" data-qhl="ls-{{ question.pk }}">{{ question.text }}</p>
+
             {% if question.question_type == 'mcq' %}
-            <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;flex-direction:column;gap:7px;">
               {% for letter, opt_text in question.choices %}
-              <label style="display:flex;align-items:center;gap:10px;padding:9px 12px;
-                            border-radius:8px;cursor:pointer;border:1px solid var(--border);
-                            transition:background .1s,border-color .1s;"
-                     onmouseover="this.style.background='var(--surface-2)';this.style.borderColor='var(--ink-3)'"
-                     onmouseout="this.style.background='transparent';this.style.borderColor='var(--border)'">
-                <input type="radio" name="q{{ question.pk }}" value="{{ letter }}"
-                       style="accent-color:var(--ink);flex-shrink:0;">
-                <span class="text-sm" style="color:var(--ink);">
-                  <b style="margin-right:6px;">{{ letter }}.</b>{{ opt_text }}
+              <label class="q-label">
+                <input type="radio" name="q{{ question.pk }}" value="{{ letter }}">
+                <span>
+                  <b style="font-weight:700;margin-right:5px;color:var(--ink-2);">{{ letter }}</b>{{ opt_text }}
                 </span>
               </label>
               {% endfor %}
             </div>
             {% else %}
-            <input type="text" name="q{{ question.pk }}" class="ml-input"
-                   style="max-width:300px;" placeholder="Write your answer">
+            <div class="q-fill-wrap">
+              <input type="text" name="q{{ question.pk }}" class="ml-input"
+                     style="font-size:14px;"
+                     placeholder="Type your answer…"
+                     autocomplete="off" autocorrect="off" spellcheck="false">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                <path d="M2 12l2.5-2.5L12 2l2 2-7.5 7.5L2 14v-2z"
+                      stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              </svg>
+            </div>
             {% endif %}
           </div>
         </div>
@@ -214,16 +292,47 @@
 
 {% block extra_js %}
 <style>
-@keyframes ml-bar1 { 0%,100%{height:4px}  50%{height:12px} }
-@keyframes ml-bar2 { 0%,100%{height:8px}  50%{height:3px}  }
-@keyframes ml-bar3 { 0%,100%{height:5px}  50%{height:11px} }
-
 #play-btn:not([data-locked]):hover {
   opacity: .85;
   transform: scale(1.07);
 }
 </style>
 <script>
+// ── Font size (shared key with reading) ───────────────────────────
+(function() {
+  const FS_KEY     = 'ml-reading-fs';
+  const FS_SIZES   = [14,15,16,17,18,19,20,22];
+  const FS_DEFAULT = 17;
+  let fsCurrent = parseInt(localStorage.getItem(FS_KEY)) || FS_DEFAULT;
+
+  function lsApplyFS(size) {
+    const qSize  = Math.max(13, size - 1);
+    const optSize= Math.max(13, size - 2);
+    const lhQ    = size >= 20 ? '2.0' : '1.85';
+    document.querySelectorAll('.q-text').forEach(el => {
+      el.style.setProperty('font-size',   qSize + 'px', 'important');
+      el.style.setProperty('line-height', lhQ,           'important');
+    });
+    document.querySelectorAll('.q-label span').forEach(el => {
+      el.style.setProperty('font-size', optSize + 'px', 'important');
+    });
+    try { localStorage.setItem(FS_KEY, size); } catch(_) {}
+  }
+
+  window.lsChangeFontSize = function(dir) {
+    if (dir === 0) { fsCurrent = FS_DEFAULT; }
+    else {
+      const idx  = FS_SIZES.indexOf(fsCurrent);
+      const next = idx + dir;
+      if (next < 0 || next >= FS_SIZES.length) return;
+      fsCurrent = FS_SIZES[next];
+    }
+    lsApplyFS(fsCurrent);
+  };
+
+  lsApplyFS(fsCurrent);
+})();
+
 // ── Timer ────────────────────────────────────────────────────────────
 new ExamTimer(
   document.getElementById('timer'),
@@ -237,10 +346,7 @@ function mlSwitchSection(idx) {
     el.style.display = i === idx ? '' : 'none';
   });
   document.querySelectorAll('[id^="tab-"]').forEach((tab, i) => {
-    const on = i === idx;
-    tab.style.color            = on ? 'var(--ink)' : 'var(--muted)';
-    tab.style.borderBottomColor = on ? 'var(--ink)' : 'transparent';
-    tab.style.fontWeight       = on ? '600' : '500';
+    tab.classList.toggle('active', i === idx);
   });
   document.getElementById('exam-form').scrollTop = 0;
 }
@@ -315,6 +421,93 @@ mlSwitchSection(0);
     const icon = document.getElementById('vol-icon');
     if (icon) icon.style.opacity = parseFloat(v) < 0.05 ? '0.3' : '1';
   };
+})();
+
+// ── Highlight for question text ───────────────────────────────────
+(function() {
+  const toolbar = document.getElementById('hl-toolbar-ls');
+  const LS_KEY  = 'ls-hl-{{ attempt.pk }}';
+
+  function getZone(node) {
+    return node?.parentElement?.closest('.q-text[data-qhl]') || null;
+  }
+
+  function showTB(x, y) {
+    toolbar.style.display = 'flex';
+    toolbar.style.left = Math.max(8, Math.min(window.innerWidth - 216, x - 100)) + 'px';
+    toolbar.style.top  = Math.max(8, y - 50) + 'px';
+  }
+  function hideTB() { toolbar.style.display = 'none'; }
+
+  document.addEventListener('mouseup', e => {
+    if (toolbar.contains(e.target)) return;
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) { hideTB(); return; }
+    if (!getZone(sel.anchorNode)) { hideTB(); return; }
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    showTB(rect.left + rect.width / 2, rect.top + window.scrollY);
+  });
+  document.addEventListener('mousedown', e => {
+    if (!toolbar.contains(e.target)) hideTB();
+  });
+
+  function attachRemove(span) {
+    span.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const p = this.parentNode;
+      while (this.firstChild) p.insertBefore(this.firstChild, this);
+      p.removeChild(this);
+      save();
+    });
+  }
+
+  function save() {
+    const data = {};
+    document.querySelectorAll('.q-text[data-qhl]').forEach(el => {
+      data[el.dataset.qhl] = el.innerHTML;
+    });
+    try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(_) {}
+  }
+
+  function restore() {
+    try {
+      const data = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      document.querySelectorAll('.q-text[data-qhl]').forEach(el => {
+        if (data[el.dataset.qhl]) {
+          el.innerHTML = data[el.dataset.qhl];
+          el.querySelectorAll('.hl').forEach(attachRemove);
+        }
+      });
+    } catch(_) {}
+  }
+
+  window.lsHL = function(cls) {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    if (!getZone(range.startContainer)) return;
+    const span = document.createElement('span');
+    span.className = 'hl ' + cls;
+    span.title = 'Click to remove';
+    try { range.surroundContents(span); }
+    catch(_) { const f = range.extractContents(); span.appendChild(f); range.insertNode(span); }
+    attachRemove(span);
+    sel.removeAllRanges();
+    hideTB();
+    save();
+  };
+
+  window.lsClear = function() {
+    document.querySelectorAll('.hl').forEach(span => {
+      const p = span.parentNode;
+      while (span.firstChild) p.insertBefore(span.firstChild, span);
+      p.removeChild(span);
+    });
+    try { localStorage.removeItem(LS_KEY); } catch(_) {}
+    hideTB();
+  };
+
+  restore();
 })();
 </script>
 {% endblock %}

@@ -1,0 +1,541 @@
+/* ================================================================
+   MockLeap Design System v2 — Apple Liquid Glass + IELTS Style
+   ================================================================ */
+
+/* ── 1. FLOATING GLASS NAV (landing) ─────────────────────────── */
+.ml-nav-float {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+  max-width: 1140px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-radius: 20px;
+  background: rgba(250, 246, 236, 0.82);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.70);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.90) inset,
+    0 2px 8px rgba(14,27,46,.05),
+    0 16px 48px -12px rgba(14,27,46,.14);
+  z-index: 999;
+  transition: background .25s, box-shadow .25s;
+}
+.dark .ml-nav-float {
+  background: rgba(10, 18, 32, 0.84);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.05) inset,
+    0 2px 8px rgba(0,0,0,.28),
+    0 16px 48px -12px rgba(0,0,0,.46);
+}
+.ml-nav-spacer { height: 96px; }
+
+/* ── 2. FLOATING SIDEBAR ─────────────────────────────────────── */
+#sidebar {
+  background: rgba(250, 246, 236, 0.90) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.85) inset,
+    0 4px 12px rgba(14,27,46,.06),
+    0 20px 48px -12px rgba(14,27,46,.14) !important;
+}
+.dark #sidebar {
+  background: rgba(8, 14, 26, 0.92) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.04) inset,
+    0 4px 12px rgba(0,0,0,.28),
+    0 20px 48px -12px rgba(0,0,0,.44) !important;
+}
+/* Brand bar inside sidebar — no hard border */
+#sidebar .border-b { border-color: rgba(14,27,46,.07) !important; }
+.dark #sidebar .border-b { border-color: rgba(255,255,255,.07) !important; }
+
+/* Nav item refinements */
+.nav-item {
+  font-size: 13px !important;
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  transition: background .12s !important;
+}
+.nav-item.active {
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+}
+
+/* ── 3. GLASS TOPBAR (floating pill) ─────────────────────────── */
+#app-topbar {
+  background: rgba(250, 246, 236, 0.88) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+}
+.dark #app-topbar {
+  background: rgba(8, 14, 26, 0.90) !important;
+  border-color: rgba(255,255,255,.09) !important;
+}
+
+/* ── 4. CARD hover ───────────────────────────────────────────── */
+.ml-card {
+  transition: transform .18s cubic-bezier(.22,.68,0,1.2), box-shadow .18s ease !important;
+}
+.ml-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(14,27,46,.12) !important;
+}
+.dark .ml-card:hover {
+  box-shadow: 0 10px 32px rgba(0,0,0,.38) !important;
+}
+
+/* ── 5. READING PASSAGE TYPOGRAPHY ──────────────────────────── */
+.passage-body {
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif !important;
+  font-size: 17px;      /* JS overrides via inline style — NO !important */
+  line-height: 2.0;     /* JS overrides via inline style — NO !important */
+  letter-spacing: -0.008em !important;
+  color: var(--ink) !important;
+  word-spacing: 0.01em;
+}
+.passage-body p {
+  margin-bottom: 1.5em !important;
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+.passage-body p:last-child { margin-bottom: 0 !important; }
+
+/* ── Topbar icon/text buttons (font size, highlight, fullscreen) ── */
+.tb-btn {
+  display: flex; align-items: center; justify-content: center;
+  height: 28px; min-width: 28px; padding: 0 7px;
+  border: 1px solid rgba(250,246,236,.20);
+  border-radius: 8px; background: transparent;
+  color: rgba(250,246,236,.75); cursor: pointer; font-family: inherit;
+  transition: background .13s, color .13s, border-color .13s;
+  flex-shrink: 0;
+}
+.tb-btn:hover { background: rgba(250,246,236,.14); color: rgba(250,246,236,1); border-color: rgba(250,246,236,.40); }
+
+/* ── 6. EXAM TOPBAR — IELTS dark (always dark regardless of mode) */
+#exam-topbar-glass {
+  height: 56px;
+  background: #0e1b2e !important;   /* always dark navy */
+  color: rgba(250,246,236,.90);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  flex-shrink: 0;
+}
+#exam-topbar-glass .exam-title {
+  font-size: 14px; font-weight: 600;
+  color: rgba(250,246,236,.90);
+  flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#exam-topbar-glass .exam-module {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(250,246,236,.50);
+}
+#exam-topbar-glass #timer {
+  color: rgba(250,246,236,.95) !important;
+  font-family: 'Geist Mono', monospace;
+  font-size: 15px; font-weight: 600; letter-spacing: .04em;
+}
+#exam-topbar-glass #timer.timer-warn   { color: #f5b544 !important; }
+#exam-topbar-glass #timer.timer-danger { color: #ef4444 !important; }
+.exam-submit {
+  padding: 6px 18px; border-radius: 10px;
+  border: 1px solid rgba(250,246,236,.28);
+  background: rgba(250,246,236,.14);
+  color: rgba(250,246,236,.95);
+  font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: background .15s, border-color .15s;
+}
+.exam-submit:hover {
+  background: rgba(250,246,236,.24);
+  border-color: rgba(250,246,236,.48);
+}
+
+/* Exam topbar always dark-navy regardless of color mode */
+.dark #exam-topbar-glass { background: #060e1b !important; }
+
+/* Tab bar + audio bar dark mode */
+.dark #audio-bar      { background: #111c2e !important; border-color: rgba(255,255,255,.08) !important; }
+.dark #audio-bar *    { color: rgba(255,255,255,.65) !important; }
+.dark #play-btn       { background: var(--rose) !important; }
+
+/* ── 7. PASSAGE TABS ─────────────────────────────────────────── */
+.ptab {
+  padding: 0 20px !important; height: 44px !important;
+  font-size: 13px !important; font-weight: 500 !important;
+  color: var(--muted) !important;
+  border: none !important; border-bottom: 2px solid transparent !important;
+  background: transparent !important; cursor: pointer !important;
+  transition: color .14s, border-color .14s !important;
+  white-space: nowrap !important; flex-shrink: 0 !important;
+}
+.ptab:hover   { color: var(--ink-2) !important; }
+.ptab.active  { color: var(--ink) !important; border-bottom-color: var(--ink) !important; font-weight: 600 !important; }
+
+/* ── 8. EXAM PANES ───────────────────────────────────────────── */
+.exam-pane:first-child       { background: #faf6ec !important; }
+.dark .exam-pane:first-child { background: #0d1520 !important; }
+.exam-pane:last-child        { background: var(--bg-2) !important; }
+.dark .exam-pane:last-child  { background: #111c2e !important; }
+
+/* Dark mode passage text */
+.dark .passage-body { color: #d8cfc0 !important; }
+.dark .passage-body p { color: #d8cfc0 !important; }
+
+/* Dark mode question text */
+.dark .q-text         { color: #cfc8bc !important; }
+.dark .q-label        { border-color: rgba(255,255,255,.12) !important; }
+.dark .q-label span   { color: #cfc8bc !important; }
+.dark .q-label:hover  { background: rgba(255,255,255,.06) !important; border-color: rgba(255,255,255,.25) !important; }
+.dark .q-label:has(input:checked) { background: rgba(255,255,255,.10) !important; border-color: rgba(255,255,255,.45) !important; }
+
+/* Dark mode group header */
+.dark .q-group-header    { background: rgba(255,255,255,.05) !important; border-left-color: var(--accent) !important; }
+.dark .q-group-type      { color: rgba(255,255,255,.40) !important; }
+.dark .q-group-instructions { color: rgba(255,255,255,.65) !important; }
+
+/* Dark mode TFNG pills */
+.dark .tfng-btn         { border-color: rgba(255,255,255,.15) !important; color: rgba(255,255,255,.55) !important; }
+.dark .tfng-btn:hover   { border-color: rgba(255,255,255,.40) !important; color: rgba(255,255,255,.90) !important; }
+.dark .tfng-btn.selected { border-color: rgba(255,255,255,.80) !important; color: white !important; background: rgba(255,255,255,.12) !important; }
+
+/* Dark mode fill input */
+.dark .q-fill-wrap input { background: rgba(255,255,255,.07) !important; border-color: rgba(255,255,255,.15) !important; color: #d8cfc0 !important; }
+.dark .q-fill-wrap svg   { color: rgba(255,255,255,.30) !important; }
+
+/* Dark mode passage section header (q-sec) */
+.dark #question-pane [id^="qsec-"] { border-bottom-color: rgba(255,255,255,.12) !important; }
+.dark #question-pane [id^="qsec-"] span { color: rgba(255,255,255,.80) !important; }
+
+/* Dark mode section description (listening) */
+.dark .section-desc-box { background: rgba(255,255,255,.06) !important; color: rgba(255,255,255,.65) !important; }
+
+/* Dark mode passage title */
+.dark .passage-zone h2  { color: #e8e0d4 !important; }
+.dark .passage-zone [style*="font-size:11px"] { color: rgba(255,255,255,.40) !important; }
+
+/* Dark mode tab bar */
+.dark .exam-pane .flex[style*="background:var(--bg-2)"] { background: #111c2e !important; }
+
+/* Dark mode highlight toolbar */
+.dark #hl-toolbar, .dark #hl-toolbar-ls { background: #1a2540 !important; border-color: rgba(255,255,255,.12) !important; }
+
+/* Dark mode font size buttons */
+.dark .fs-btn { border-color: rgba(255,255,255,.18) !important; color: rgba(255,255,255,.50) !important; }
+.dark .fs-btn:hover { background: rgba(255,255,255,.08) !important; color: white !important; }
+
+/* ── 9. RESIZE HANDLE ────────────────────────────────────────── */
+#exam-resizer {
+  width: 2px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--border);
+  position: relative;
+  z-index: 2;
+  transition: background .15s;
+}
+/* Wide invisible hit area around the 2px visual line */
+#exam-resizer::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -8px; right: -8px;
+  cursor: col-resize;
+}
+/* Pill grip indicator */
+#exam-resizer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 48px;
+  border-radius: 4px;
+  background: var(--border-2);
+  transition: background .15s, transform .15s;
+  pointer-events: none;
+}
+#exam-resizer:hover::after,
+#exam-resizer.dragging::after {
+  background: var(--ink-2);
+  transform: translate(-50%, -50%) scaleX(1.5);
+}
+#exam-resizer.dragging { background: var(--ink-2); }
+
+/* ── 10. QUESTION NUMBERS (IELTS dark circles) ───────────────── */
+.q-num {
+  width: 28px !important; height: 28px !important;
+  border-radius: 50% !important;
+  background: var(--ink) !important;
+  color: var(--bg) !important;
+  font-size: 11.5px !important; font-weight: 700 !important;
+  font-family: 'Geist Mono', monospace !important;
+  display: inline-flex !important; align-items: center !important;
+  justify-content: center !important; flex-shrink: 0 !important;
+  border: none !important; margin-top: 2px;
+}
+
+/* ── 11. QUESTION BLOCK ──────────────────────────────────────── */
+.q-block {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.q-block:last-child { border-bottom: none; }
+
+.q-text {
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--ink);
+  margin-bottom: 12px;
+  font-family: 'Newsreader', Georgia, serif;
+  letter-spacing: -0.005em;
+}
+
+/* MCQ option label text */
+.q-label span {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: -0.003em;
+}
+
+/* ── 12. MCQ OPTIONS ─────────────────────────────────────────── */
+.q-label {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid var(--border) !important;
+  cursor: pointer !important;
+  margin-bottom: 6px !important;
+  transition: background .12s, border-color .12s !important;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.q-label:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent) !important;
+  border-color: var(--ink-2) !important;
+}
+.q-label:has(input:checked) {
+  background: color-mix(in srgb, var(--ink) 8%, transparent) !important;
+  border-color: var(--ink) !important;
+}
+.q-label input[type="radio"] {
+  width: 15px !important; height: 15px !important;
+  flex-shrink: 0 !important; margin-top: 2px !important;
+  accent-color: var(--ink) !important;
+}
+
+/* ── 13. TFNG BUTTONS ────────────────────────────────────────── */
+.tfng-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  transition: all .14s;
+  user-select: none;
+  font-family: 'Geist', sans-serif;
+}
+.tfng-btn:hover { border-color: var(--ink-2); color: var(--ink); background: var(--surface-2); }
+.tfng-btn.selected { border-color: var(--ink); color: var(--ink); background: color-mix(in srgb,var(--ink) 8%, transparent); }
+
+/* ── 14. FILL INPUT ──────────────────────────────────────────── */
+.q-fill-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 340px;
+  width: 100%;
+}
+.q-fill-wrap input {
+  width: 100%;
+  font-size: 14px !important;
+  padding-right: 36px !important;
+  font-family: 'Geist', sans-serif !important;
+}
+.q-fill-wrap svg {
+  position: absolute;
+  right: 10px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+/* ── 15. LISTENING WAVEFORM ANIMATION ────────────────────────── */
+@keyframes ml-wave1 { 0%,100%{height:4px}  25%{height:14px} 50%{height:6px}  75%{height:12px} }
+@keyframes ml-wave2 { 0%,100%{height:12px} 25%{height:4px}  50%{height:14px} 75%{height:6px}  }
+@keyframes ml-wave3 { 0%,100%{height:7px}  25%{height:13px} 50%{height:5px}  75%{height:15px} }
+@keyframes ml-wave4 { 0%,100%{height:14px} 25%{height:5px}  50%{height:11px} 75%{height:4px}  }
+@keyframes ml-wave5 { 0%,100%{height:5px}  25%{height:11px} 50%{height:13px} 75%{height:7px}  }
+
+.ml-waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+}
+.ml-waveform span {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: white;
+}
+.ml-waveform span:nth-child(1) { animation: ml-wave1 .9s ease infinite; }
+.ml-waveform span:nth-child(2) { animation: ml-wave2 .9s ease infinite .1s; }
+.ml-waveform span:nth-child(3) { animation: ml-wave3 .9s ease infinite .2s; }
+.ml-waveform span:nth-child(4) { animation: ml-wave4 .9s ease infinite .05s; }
+.ml-waveform span:nth-child(5) { animation: ml-wave5 .9s ease infinite .15s; }
+
+/* ── 16. SCROLLBAR ───────────────────────────────────────────── */
+.exam-pane::-webkit-scrollbar { width: 5px; }
+.exam-pane::-webkit-scrollbar-track { background: transparent; }
+.exam-pane::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+.exam-pane::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ── 17. FONT SIZE BUTTONS ───────────────────────────────────── */
+.fs-btn {
+  padding: 2px 9px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; cursor: pointer;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  transition: all .12s;
+}
+.fs-btn:hover { background: var(--surface-2); color: var(--ink); border-color: var(--ink-2); }
+
+/* ── 18. QUESTION GROUP HEADER ───────────────────────────────── */
+.q-group-header {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--ink);
+  margin-bottom: 16px;
+}
+.q-group-type {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.q-group-instructions {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* ── 19. PASSAGE SECTION DIVIDER ─────────────────────────────── */
+.q-passage-hdr {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 14px 0 12px !important;
+  border-bottom: 2px solid var(--border) !important;
+  margin-bottom: 20px !important;
+}
+
+/* ── 20. MOBILE RESPONSIVE ───────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Landing nav */
+  .ml-nav-float {
+    top: 12px;
+    width: calc(100% - 24px);
+    height: 52px;
+    border-radius: 16px;
+    padding: 0 14px;
+  }
+  .ml-nav-spacer { height: 80px; }
+  .ml-nav-links  { display: none !important; }
+
+  /* Sidebar: full-screen overlay on mobile */
+  #sidebar {
+    top: 0 !important; bottom: 0 !important;
+    left: 0 !important; right: auto !important;
+    width: 260px !important;
+    border-radius: 0 20px 20px 0 !important;
+  }
+
+  /* Exam: stack vertically */
+  #exam-wrap  { height: auto !important; min-height: 100dvh; }
+  #exam-body  {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  /* Grid → single column stack on mobile */
+  #exam-body {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 45vh 1fr !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  #passage-pane  { max-height: 45vh; border-right: none !important; border-bottom: 1px solid var(--border); overflow-y: auto !important; }
+  #question-pane { overflow-y: visible !important; padding-bottom: 80px !important; }
+  #exam-resizer  { display: none !important; }
+
+  .exam-pane:first-child { overflow-y: auto !important; }
+
+  /* Passage text smaller on mobile */
+  .passage-body { font-size: 15.5px !important; line-height: 1.9 !important; }
+
+  /* Exam topbar compact */
+  #exam-topbar-glass { padding: 0 14px; gap: 8px; }
+  #exam-topbar-glass .exam-title { font-size: 12px; }
+
+  /* App topbar pill */
+  #app-topbar { border-radius: 12px !important; }
+}
+
+@media (max-width: 480px) {
+  .passage-body { font-size: 15px !important; }
+  .q-text { font-size: 14px !important; }
+}
+
+/* ── 21. SECTION DESCRIPTION BOX (listening) ─────────────────── */
+.section-desc-box {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  margin-top: 8px;
+}
+
+/* ── 22. SAFE AREA PADDING ───────────────────────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .exam-pane:last-child, main {
+    padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+  }
+}

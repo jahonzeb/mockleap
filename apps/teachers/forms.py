@@ -46,7 +46,7 @@ class ListeningTestForm(forms.ModelForm):
 class ListeningSectionForm(forms.ModelForm):
     class Meta:
         model   = ListeningSection
-        fields  = ['order', 'title', 'description']
+        fields  = ['order', 'title', 'description', 'audio_file']
         widgets = {
             'title':       _input('Section title'),
             'description': _textarea(3),

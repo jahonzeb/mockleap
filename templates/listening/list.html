@@ -13,6 +13,13 @@
   {% for test in tests %}
   <div class="ml-card p-5 flex flex-col gap-4">
     <div>
+      {% with sc=test.sections.count %}
+      {% if sc == 4 %}
+      <span class="ml-chip mb-2" style="background:var(--surface-2);color:var(--muted);">Full test</span>
+      {% elif sc > 0 %}
+      <span class="ml-chip mb-2" style="background:var(--surface-2);color:var(--muted);">{{ sc }} section{{ sc|pluralize }}</span>
+      {% endif %}
+      {% endwith %}
       <h3 class="text-sm font-semibold" style="color:var(--ink);">{{ test.title }}</h3>
       <p class="t-meta mt-1">{{ test.duration_minutes }} min</p>
     </div>

@@ -1,6 +1,14 @@
 {% load static %}
-<aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-60 flex flex-col border-r -translate-x-full md:translate-x-0 transition-transform duration-200"
-       style="background:var(--bg-2);border-color:var(--border);">
+<aside id="sidebar" class="fixed z-30 w-60 flex flex-col -translate-x-full md:translate-x-0 transition-transform duration-300"
+       style="top:12px;bottom:12px;left:12px;width:228px;border-radius:20px;
+              background:rgba(250,246,236,0.90);
+              backdrop-filter:blur(28px) saturate(180%);
+              -webkit-backdrop-filter:blur(28px) saturate(180%);
+              border:1px solid rgba(255,255,255,0.72);
+              box-shadow:0 1px 0 rgba(255,255,255,.85) inset,
+                         0 4px 12px rgba(14,27,46,.06),
+                         0 20px 48px -12px rgba(14,27,46,.14);
+              overflow:hidden;">
 
   <!-- Brand -->
   <div class="h-16 flex items-center px-5 border-b flex-shrink-0" style="border-color:var(--border);">

@@ -29,24 +29,25 @@
 {% block body %}
 <div style="position:relative;z-index:1;">
 
-<!-- NAV -->
-<nav class="ml-row" style="height:72px;padding:0 60px;justify-content:space-between;border-bottom:.5px solid var(--border);background:var(--bg-2);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);">
-  <div class="ml-row" style="gap:36px;">
-    <a href="/" class="ml-mark" style="text-decoration:none;">
+<!-- NAV (floating glass pill) -->
+<nav class="ml-nav-float ml-row" style="justify-content:space-between;">
+  <div class="ml-row" style="gap:32px;">
+    <a href="/" class="ml-mark" style="text-decoration:none;flex-shrink:0;">
       <span class="ml-mark-dot" style="width:8px;height:8px;"></span>
       <span>MockLeap</span>
     </a>
-    <div class="ml-row" style="gap:28px;" class="hidden md:flex">
-      <a href="{% url 'reading:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Reading</a>
-      <a href="{% url 'listening:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Listening</a>
-      <a href="{% url 'writing:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Writing</a>
-      <a href="{% url 'speaking:list' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Speaking</a>
-      <a href="{% url 'community:rooms' %}" class="t-body" style="font-size:13px;font-weight:500;cursor:pointer;">Community</a>
+    <div class="ml-nav-links ml-row" style="gap:24px;">
+      <a href="{% url 'reading:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Reading</a>
+      <a href="{% url 'listening:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Listening</a>
+      <a href="{% url 'writing:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Writing</a>
+      <a href="{% url 'speaking:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Speaking</a>
+      <a href="{% url 'community:rooms' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Community</a>
     </div>
   </div>
-  <div class="ml-row" style="gap:12px;">
-    <button onclick="DarkMode.toggle()" class="ml-btn ml-btn-ghost ml-btn-sm" style="padding:0;min-width:36px;" aria-label="Toggle dark mode">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M8 5a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <div class="ml-row" style="gap:8px;flex-shrink:0;">
+    <button onclick="DarkMode.toggle()" class="ml-btn ml-btn-ghost ml-btn-sm" style="padding:0;min-width:34px;" aria-label="Toggle dark mode">
+      <svg class="dark:hidden" width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1v1M8 14v1M1 8H2M14 8h1M3.05 3.05l.7.7M12.25 12.25l.7.7M3.05 12.95l.7-.7M12.25 3.75l.7-.7M8 5a3 3 0 100 6 3 3 0 000-6z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg class="hidden dark:block" width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M13 8.5A5.5 5.5 0 117.5 3c-.5 2 .5 4.5 2.5 5.5 1.5.7 2.5.5 3 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
     {% if user.is_authenticated %}
       <a href="{% url 'dashboard:home' %}" class="ml-btn ml-btn-ghost ml-btn-sm">Dashboard</a>
@@ -54,14 +55,15 @@
       <a href="{% url 'account_login' %}" class="ml-btn ml-btn-ghost ml-btn-sm">Sign in</a>
       <a href="{% url 'account_signup' %}" class="ml-btn ml-btn-accent ml-btn-sm">
         Start free
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     {% endif %}
   </div>
 </nav>
+<div class="ml-nav-spacer"></div>
 
 <!-- HERO -->
-<section style="padding:88px 60px 0;position:relative;">
+<section style="padding:48px 60px 0;position:relative;">
   <div class="ml-row" style="gap:10px;margin-bottom:32px;">
     <span class="ml-chip ml-chip-accent" style="height:28px;padding:0 12px;font-size:12px;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.6 4.4 4.4 1.6-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3zM19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>

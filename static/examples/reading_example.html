@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║   MockLeap Reading Import Format — AI Template Guide    ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  QANDAY ISHLATILADI:
+  1. Bu faylni AI'ga bering va o'z matnlaringiz bilan to'ldiring
+  2. Teacher paneliga boring: Reading Tests → test → Import from HTML
+  3. "Single Part" yoki "Full Test" tanlang va faylni yuklang
+
+  QOIDALAR:
+  ┌─ ml-passage ─────────────────────────────────────────────┐
+  │  data-title  = passage sarlavhasi                        │
+  │  data-source = manba (ixtiyoriy)                        │
+  │  ichida <p> teglari = passage matn paragraflari          │
+  └──────────────────────────────────────────────────────────┘
+  ┌─ ml-question-group ──────────────────────────────────────┐
+  │  data-type = mcq | tfng | fill | summary | match | short │
+  │  data-instructions = talabaga ko'rsatiladigan yo'riqnoma │
+  └──────────────────────────────────────────────────────────┘
+  ┌─ ml-question ────────────────────────────────────────────┐
+  │  data-number = savol raqami (1, 2, 3...)                 │
+  │  data-answer = to'g'ri javob                             │
+  │    MCQ uchun: A | B | C | D                              │
+  │    TFNG uchun: True | False | Not Given                  │
+  │    Fill uchun: so'z yoki ibora                           │
+  └──────────────────────────────────────────────────────────┘
+
+  MCQ VARIANTLARI:
+  - Variantlar faqat matn sifatida yozing (A. B. C. prefikssiz)
+  - Tizim A/B/C/D harflarini avtomatik qo'shadi
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reading Import Example — The Origins of Coffee</title>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PASSAGE
+     Matn shu yerga yoziladi. Har paragraf alohida <p> tegida.
+     ═══════════════════════════════════════════════════════════ -->
+<div class="ml-passage"
+     data-title="The Origins of Coffee"
+     data-source="National Geographic, 2022">
+
+  <p>Coffee, one of the world's most widely consumed beverages, has a history that stretches back to the ancient coffee forests on the Ethiopian plateau. According to legend, Kaldi, a goat herder, first discovered the potential of these beloved beans after noticing that his goats became so energetic after eating berries from a certain tree that they did not want to sleep at night.</p>
+
+  <p>From Ethiopia, coffee cultivation and trade began on the Arabian Peninsula. By the 15th century, coffee was being grown in the Yemeni district of Arabia. By the 16th century, it was known in the rest of the Middle East, Persia, Turkey, and North Africa. Coffee houses, known as qahveh khaneh, appeared in the Near East and became incredibly popular. People came to these establishments for all kinds of social activity.</p>
+
+  <p>European travellers to the Near East brought back stories of an unusual dark black beverage. By the 17th century, coffee had made its way to Europe and was becoming popular across the continent. In England, "penny universities" sprang up, so called because for the price of a penny one could purchase a cup of coffee and engage in stimulating conversation.</p>
+
+  <p>Coffee began to replace the common breakfast drinks of the time — beer and wine. Those who drank coffee instead of alcohol began the day alert and energized, and their work was noticeably better. By the mid-17th century, there were over 300 coffee houses in London, many of which attracted merchants, shippers, brokers, and artists.</p>
+
+  <p>In the mid-1600's, coffee was brought to New Amsterdam, later called New York by the British. Though coffee houses rapidly began to appear, tea continued to be the favored drink in the New World until 1773, when the colonists revolted against a heavy tax on tea imposed by King George III. The revolt, known as the Boston Tea Party, would forever change the American drinking preference to coffee.</p>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SAVOL GURUHI 1 — Multiple Choice (MCQ)
+     data-type="mcq"
+     Javob: A, B, C yoki D (faqat harf, qo'shtirnoqsiz)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="ml-question-group"
+     data-type="mcq"
+     data-instructions="Choose the correct letter, A, B, C or D.">
+
+  <div class="ml-question" data-number="1" data-answer="B">
+    <p class="ml-text">According to the legend, how was coffee first discovered?</p>
+    <p class="ml-option-a">A monk noticed the berries had medicinal properties.</p>
+    <p class="ml-option-b">A goat herder observed that his animals became unusually energetic after eating certain berries.</p>
+    <p class="ml-option-c">Farmers accidentally fermented the berries and tasted the result.</p>
+    <p class="ml-option-d">Traders from Arabia introduced coffee knowledge to Ethiopian farmers.</p>
+  </div>
+
+  <div class="ml-question" data-number="2" data-answer="C">
+    <p class="ml-text">Where did coffee cultivation and trade begin after leaving Ethiopia?</p>
+    <p class="ml-option-a">Turkey</p>
+    <p class="ml-option-b">Persia</p>
+    <p class="ml-option-c">The Arabian Peninsula</p>
+    <p class="ml-option-d">North Africa</p>
+  </div>
+
+  <div class="ml-question" data-number="3" data-answer="A">
+    <p class="ml-text">Why were English coffee houses called "penny universities"?</p>
+    <p class="ml-option-a">For one penny, customers could buy coffee and take part in intellectual discussions.</p>
+    <p class="ml-option-b">The coffee houses were attached to university campuses.</p>
+    <p class="ml-option-c">Only university students were allowed to enter these establishments.</p>
+    <p class="ml-option-d">They charged a penny for university-style lectures alongside coffee.</p>
+  </div>
+
+  <div class="ml-question" data-number="4" data-answer="D">
+    <p class="ml-text">What event permanently changed Americans' preference from tea to coffee?</p>
+    <p class="ml-option-a">The arrival of coffee merchants from Arabia</p>
+    <p class="ml-option-b">The opening of the first coffee house in New York</p>
+    <p class="ml-option-c">The discovery of native coffee plants in New England</p>
+    <p class="ml-option-d">A colonial rebellion against a heavy tax on tea</p>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SAVOL GURUHI 2 — True / False / Not Given (TFNG)
+     data-type="tfng"
+     Javob: True | False | Not Given  (aynan shunday yozing)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="ml-question-group"
+     data-type="tfng"
+     data-instructions="Do the following statements agree with the information given in the passage? Write TRUE, FALSE or NOT GIVEN.">
+
+  <div class="ml-question" data-number="5" data-answer="True">
+    <p class="ml-text">Coffee was first discovered in Ethiopia.</p>
+  </div>
+
+  <div class="ml-question" data-number="6" data-answer="False">
+    <p class="ml-text">Tea was the dominant breakfast drink in 17th century England before coffee replaced it.</p>
+  </div>
+
+  <div class="ml-question" data-number="7" data-answer="Not Given">
+    <p class="ml-text">Coffee consumption in Arabia was officially banned at certain periods during the 16th century.</p>
+  </div>
+
+  <div class="ml-question" data-number="8" data-answer="True">
+    <p class="ml-text">Workers who drank coffee were observed to perform their duties more effectively than those who drank alcohol.</p>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SAVOL GURUHI 3 — Fill in the Blank (Sentence Completion)
+     data-type="fill"
+     Javob: to'ldiriladigan so'z yoki ibora (passage'dan olingan)
+     Savol matni: bo'sh joy uchun ______ yozing
+     ═══════════════════════════════════════════════════════════ -->
+<div class="ml-question-group"
+     data-type="fill"
+     data-instructions="Complete the sentences below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER from the passage for each answer.">
+
+  <div class="ml-question" data-number="9" data-answer="Arabian Peninsula">
+    <p class="ml-text">After Ethiopia, coffee cultivation and trade first moved to the ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="10" data-answer="qahveh khaneh">
+    <p class="ml-text">Coffee houses in the Near East were known as ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="11" data-answer="penny">
+    <p class="ml-text">In 17th century England, a cup of coffee in a coffee house cost one ______.</p>
+  </div>
+
+  <div class="ml-question" data-number="12" data-answer="300">
+    <p class="ml-text">By the mid-17th century, London had more than ______ coffee houses.</p>
+  </div>
+
+  <div class="ml-question" data-number="13" data-answer="Boston Tea Party">
+    <p class="ml-text">The colonial rebellion against the tea tax was known as the ______.</p>
+  </div>
+
+</div>
+
+</body>
+</html>
