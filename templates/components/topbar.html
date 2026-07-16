@@ -54,24 +54,6 @@
         </svg>
       </button>
 
-      <!-- Notifications bell -->
-      <a href="{% url 'notifications:list' %}"
-         style="width:34px;height:34px;border-radius:10px;border:none;
-                background:transparent;cursor:pointer;color:var(--ink-2);
-                display:flex;align-items:center;justify-content:center;
-                text-decoration:none;transition:background .12s;position:relative;"
-         aria-label="Notifications"
-         onmouseover="this.style.background='var(--surface-2)'"
-         onmouseout="this.style.background='transparent'">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 1a5 5 0 00-5 5v3l-1.5 2h13L13 9V6a5 5 0 00-5-5zM6.5 13a1.5 1.5 0 003 0"
-                stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        </svg>
-        {% if unread_count %}
-        <span style="position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;
-                     background:var(--warn);border:1.5px solid var(--bg-2);"></span>
-        {% endif %}
-      </a>
     </div>
   </header>
 </div>

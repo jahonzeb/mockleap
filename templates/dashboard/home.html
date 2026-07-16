@@ -103,10 +103,21 @@
           <div class="q-num {% if a.band_score %}q-num-done{% endif %}">{{ forloop.counter }}</div>
           <div class="flex-1 min-w-0">
             <div class="text-sm font-medium truncate" style="color:var(--ink);">{{ a.test.title }}</div>
-            <div class="t-meta">{{ a.submitted_at|date:"M j" }}</div>
+            <div class="t-meta flex items-center gap-2 mt-0.5">
+              <span>{{ a.submitted_at|date:"M j" }}</span>
+              {% if a.score_raw is not None %}
+                <span style="color:var(--border-strong);">•</span>
+                <span style="color:#059669;">{{ a.score_raw }} correct</span>
+                <span style="color:var(--border-strong);">•</span>
+                <span style="color:#e11d48;">{{ 40|add:"-"|add:a.score_raw }} incorrect</span>
+              {% endif %}
+            </div>
           </div>
           {% if a.band_score %}
-            <span class="ml-chip ml-chip-ok tnum">{{ a.band_score }}</span>
+            <div class="flex flex-col items-center justify-center">
+              <span class="t-meta" style="font-size:10px; margin-bottom:-2px;">Band</span>
+              <span class="ml-chip ml-chip-ok tnum" style="font-size:16px; font-weight:700; padding:4px 8px;">{{ a.band_score }}</span>
+            </div>
           {% endif %}
         </div>
         {% endfor %}
@@ -119,33 +130,42 @@
     {% endif %}
   </div>
 
-  <!-- Recent Writing -->
+  <!-- Recent Listening -->
   <div class="ml-card p-5">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-semibold" style="color:var(--ink);">Recent Writing</h3>
-      <a href="{% url 'writing:list' %}" class="t-meta text-xs hover:underline">View all</a>
+      <h3 class="text-sm font-semibold" style="color:var(--ink);">Recent Listening</h3>
+      <a href="{% url 'listening:list' %}" class="t-meta text-xs hover:underline">View all</a>
     </div>
-    {% if writing_subs %}
+    {% if listening_attempts %}
       <div class="space-y-3">
-        {% for s in writing_subs %}
+        {% for a in listening_attempts %}
         <div class="flex items-center gap-3">
-          <div class="q-num {% if s.status == 'reviewed' %}q-num-done{% elif s.status == 'submitted' %}q-num-review{% endif %}">{{ forloop.counter }}</div>
+          <div class="q-num {% if a.band_score %}q-num-done{% endif %}">{{ forloop.counter }}</div>
           <div class="flex-1 min-w-0">
-            <div class="text-sm font-medium truncate" style="color:var(--ink);">{{ s.task.test.title }} · {{ s.task.get_task_type_display }}</div>
-            <div class="t-meta">{{ s.created_at|date:"M j" }}</div>
+            <div class="text-sm font-medium truncate" style="color:var(--ink);">{{ a.test.title }}</div>
+            <div class="t-meta flex items-center gap-2 mt-0.5">
+              <span>{{ a.submitted_at|date:"M j" }}</span>
+              {% if a.score_raw is not None %}
+                <span style="color:var(--border-strong);">•</span>
+                <span style="color:#059669;">{{ a.score_raw }} correct</span>
+                <span style="color:var(--border-strong);">•</span>
+                <span style="color:#e11d48;">{{ 40|add:"-"|add:a.score_raw }} incorrect</span>
+              {% endif %}
+            </div>
           </div>
-          {% if s.overall_band %}
-            <span class="ml-chip ml-chip-ok tnum">{{ s.overall_band }}</span>
-          {% elif s.status == 'submitted' %}
-            <span class="ml-chip" style="font-size:10px;">Pending</span>
+          {% if a.band_score %}
+            <div class="flex flex-col items-center justify-center">
+              <span class="t-meta" style="font-size:10px; margin-bottom:-2px;">Band</span>
+              <span class="ml-chip ml-chip-ok tnum" style="font-size:16px; font-weight:700; padding:4px 8px;">{{ a.band_score }}</span>
+            </div>
           {% endif %}
         </div>
         {% endfor %}
       </div>
     {% else %}
       <div class="py-8 text-center">
-        <p class="t-meta">No writing submissions yet.</p>
-        <a href="{% url 'writing:list' %}" class="ml-btn ml-btn-soft ml-btn-sm mt-3">Start now</a>
+        <p class="t-meta">No listening attempts yet.</p>
+        <a href="{% url 'listening:list' %}" class="ml-btn ml-btn-soft ml-btn-sm mt-3">Start now</a>
       </div>
     {% endif %}
   </div>

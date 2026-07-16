@@ -27,11 +27,11 @@
 .fs-btn:hover { background:var(--surface-2);color:var(--ink); }
 
 /* ── Highlights ─────────────────────────────────────────── */
-.hl           { border-radius:2px;cursor:pointer; }
-.hl-yellow    { background:#FDE68A; }
-.hl-green     { background:#BBF7D0; }
-.hl-blue      { background:#BFDBFE; }
-.hl-pink      { background:#FECDD3; }
+.hl           { border-radius:2px;cursor:pointer; color: #0f172a !important; font-weight: 500; }
+.hl-yellow    { background:#FDE68A !important; }
+.hl-green     { background:#BBF7D0 !important; }
+.hl-blue      { background:#BFDBFE !important; }
+.hl-pink      { background:#FECDD3 !important; }
 
 
 /* ── Question answer inputs ─────────────────────────────── */
@@ -193,71 +193,9 @@
           </span>
         </div>
 
-        {% for group in passage.question_groups.all %}
-        <div style="margin-bottom:28px;">
-
-          <!-- Group header -->
-          <div class="q-group-header">
-            <div class="q-group-type">{{ group.get_question_type_display }}</div>
-            {% if group.instructions %}
-            <div class="q-group-instructions">{{ group.instructions }}</div>
-            {% endif %}
-          </div>
-
-          <!-- Questions -->
-          {% for question in group.questions.all %}
-          <div style="display:flex;gap:12px;padding:14px 0;
-                      border-bottom:1px solid var(--border);align-items:flex-start;">
-            <span class="q-num">{{ question.number }}</span>
-            <div style="flex:1;min-width:0;">
-              <p class="q-text" data-qhl="qtext-{{ question.pk }}">{{ question.text }}</p>
-
-              {% if group.question_type == 'mcq' %}
-                <div style="display:flex;flex-direction:column;gap:7px;">
-                {% for letter, opt_text in question.choices %}
-                <label class="q-label">
-                  <input type="radio" name="q{{ question.pk }}" value="{{ letter }}">
-                  <span>
-                    <b style="font-weight:700;margin-right:5px;color:var(--ink-2);">{{ letter }}</b>{{ opt_text }}
-                  </span>
-                </label>
-                {% endfor %}
-                </div>
-
-              {% elif group.question_type == 'tfng' %}
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                  {% for val in tfng_values %}
-                  <label class="tfng-btn">
-                    <input type="radio" name="q{{ question.pk }}" value="{{ val }}"
-                           style="position:absolute;opacity:0;pointer-events:none;"
-                           onchange="(function(inp){
-                             document.querySelectorAll('[name=\'q{{ question.pk }}\']').forEach(r=>{
-                               r.closest('label').classList.remove('selected');
-                             });
-                             inp.closest('label').classList.add('selected');
-                           })(this)">
-                    {{ val }}
-                  </label>
-                  {% endfor %}
-                </div>
-
-              {% else %}
-                <div class="q-fill-wrap">
-                  <input type="text" name="q{{ question.pk }}" class="ml-input"
-                         style="font-size:14px;"
-                         placeholder="Your answer…"
-                         autocomplete="off" autocorrect="off" spellcheck="false">
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                    <path d="M2 12l2.5-2.5L12 2l2 2-7.5 7.5L2 14v-2z"
-                          stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-                  </svg>
-                </div>
-              {% endif %}
-            </div>
-          </div>
-          {% endfor %}
+        <div class="ml-freeform-questions">
+          {{ passage.questions_html|safe }}
         </div>
-        {% endfor %}
 
         {% endfor %}
 

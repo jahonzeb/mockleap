@@ -11,7 +11,7 @@
 {% if tests %}
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
   {% for test in tests %}
-  <div class="ml-card p-5 flex flex-col gap-4">
+  <div class="ml-card p-5 flex flex-col gap-4 relative">
     <div class="flex items-start justify-between gap-3">
       <div>
         <span class="ml-chip {% if test.test_type == 'academic' %}ml-chip-accent{% else %}ml-chip-ok{% endif %} mb-2">{{ test.get_test_type_display }}</span>
@@ -24,6 +24,21 @@
         {% endwith %}
         <h3 class="text-sm font-semibold" style="color:var(--ink);">{{ test.title }}</h3>
       </div>
+      
+      {% if request.user.is_superuser %}
+      <!-- Admin Actions Dropdown -->
+      <div class="relative" x-data="{ open: false }">
+        <button @click="open = !open" @click.outside="open = false" class="ml-btn ml-btn-ghost ml-btn-sm" style="padding:4px; min-width:32px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+        </button>
+        <div x-show="open" style="display:none; position:absolute; right:0; margin-top:8px; width:190px; border-radius:8px; background:var(--bg-2); border:1px solid var(--border); box-shadow:0 10px 15px -3px rgba(0,0,0,0.2); z-index:50; overflow:hidden;" x-transition>
+          <button @click="$dispatch('open-edit-modal', {id: {{ test.pk }}, title: '{{ test.title|escapejs }}'}); open = false" style="display:block; width:100%; text-align:left; padding:10px 16px; font-size:13px; color:var(--ink); background:transparent; border:none; border-bottom:1px solid var(--border); cursor:pointer;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">✏️ Edit Title</button>
+          <a href="{% url 'reading:export' test.pk %}" style="display:block; padding:10px 16px; font-size:13px; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">📥 Export JSON</a>
+          <button @click="$dispatch('open-delete-modal', {id: {{ test.pk }}, title: '{{ test.title|escapejs }}'}); open = false" style="display:block; width:100%; text-align:left; padding:10px 16px; font-size:13px; color:var(--rose); background:transparent; border:none; border-bottom:1px solid var(--border); cursor:pointer;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">🗑️ Delete</button>
+          <a href="/admin/reading/readingtest/" style="display:block; padding:10px 16px; font-size:13px; color:var(--ink); text-decoration:none;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">⚙️ Admin Panel</a>
+        </div>
+      </div>
+      {% endif %}
     </div>
     <div class="flex items-center gap-3 mt-auto">
       <span class="t-meta text-xs">{{ test.duration_minutes }} min</span>
@@ -32,6 +47,49 @@
   </div>
   {% endfor %}
 </div>
+
+{% if request.user.is_superuser %}
+<!-- Alpine Modals -->
+<div x-data="{ editOpen: false, deleteOpen: false, testId: null, testTitle: '' }" 
+     @open-edit-modal.window="editOpen = true; testId = $event.detail.id; testTitle = $event.detail.title"
+     @open-delete-modal.window="deleteOpen = true; testId = $event.detail.id; testTitle = $event.detail.title">
+     
+  <!-- Edit Modal -->
+  <div x-show="editOpen" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);">
+    <div @click.outside="editOpen = false" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:var(--bg-2); border:1px solid var(--border); border-radius:16px; padding:24px; width:90%; max-width:400px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:16px; color:var(--ink);">Edit Test</h3>
+      <form :action="`/reading/${testId}/quick-edit/`" method="post">
+        {% csrf_token %}
+        <div style="margin-bottom:16px;">
+          <label style="display:block; font-size:13px; font-weight:500; margin-bottom:6px; color:var(--ink-2);">Title</label>
+          <input type="text" name="title" x-model="testTitle" style="width:100%; padding:10px 12px; border-radius:8px; background:var(--bg); border:1px solid var(--border); color:var(--ink); font-size:14px; outline:none;" required>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px;">
+          <button type="button" @click="editOpen = false" class="ml-btn ml-btn-ghost ml-btn-sm">Cancel</button>
+          <button type="submit" class="ml-btn ml-btn-primary ml-btn-sm">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div x-show="deleteOpen" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);">
+    <div @click.outside="deleteOpen = false" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:var(--bg-2); border:1px solid var(--border); border-radius:16px; padding:24px; width:90%; max-width:400px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:12px; color:var(--rose);">Delete Test</h3>
+      <p style="margin-bottom:24px; font-size:14px; color:var(--ink-2); line-height:1.5;">Are you sure you want to delete <strong x-text="testTitle" style="color:var(--ink);"></strong>? This action cannot be undone.</p>
+      <form :action="`/reading/${testId}/delete/`" method="post">
+        {% csrf_token %}
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+          <button type="button" @click="deleteOpen = false" class="ml-btn ml-btn-ghost ml-btn-sm">Cancel</button>
+          <button type="submit" class="ml-btn ml-btn-sm" style="background:var(--rose); color:white;">Delete Permanently</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Make sure AlpineJS is loaded if not already -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{% endif %}
 {% else %}
 <div class="py-20 text-center">
   <div class="text-4xl mb-4">📖</div>

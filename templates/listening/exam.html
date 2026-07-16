@@ -4,11 +4,11 @@
 
 {% block extra_head %}
 <style>
-.hl        { border-radius:2px; cursor:pointer; }
-.hl-yellow { background:#FDE68A; }
-.hl-green  { background:#BBF7D0; }
-.hl-blue   { background:#BFDBFE; }
-.hl-pink   { background:#FECDD3; }
+.hl        { border-radius:2px; cursor:pointer; color: #0f172a !important; font-weight: 500; }
+.hl-yellow { background:#FDE68A !important; }
+.hl-green  { background:#BBF7D0 !important; }
+.hl-blue   { background:#BFDBFE !important; }
+.hl-pink   { background:#FECDD3 !important; }
 </style>
 {% endblock %}
 
@@ -80,8 +80,8 @@
   <!-- Audio player bar -->
   <div id="audio-bar"
        style="flex-shrink:0;background:var(--bg-2);border-bottom:1px solid var(--border);padding:10px 24px;">
-    {% if test.audio_file %}
-    <audio id="main-audio" src="{{ test.audio_file.url }}" preload="metadata"></audio>
+    {% if test.get_audio_src %}
+    <audio id="main-audio" src="{{ test.get_audio_src }}" preload="metadata"></audio>
 
     <div style="max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;">
 
@@ -202,42 +202,9 @@
           {% endif %}
         </div>
 
-        <!-- Questions -->
-        {% for question in section.questions.all %}
-        <div style="display:flex;gap:12px;padding:14px 0;
-                    border-bottom:1px solid var(--border);align-items:flex-start;">
-          <span class="q-num">{{ question.number }}</span>
-          <div style="flex:1;min-width:0;">
-            <p class="q-text" data-qhl="ls-{{ question.pk }}">{{ question.text }}</p>
-
-            {% if question.question_type == 'mcq' %}
-            <div style="display:flex;flex-direction:column;gap:7px;">
-              {% for letter, opt_text in question.choices %}
-              <label class="q-label">
-                <input type="radio" name="q{{ question.pk }}" value="{{ letter }}">
-                <span>
-                  <b style="font-weight:700;margin-right:5px;color:var(--ink-2);">{{ letter }}</b>{{ opt_text }}
-                </span>
-              </label>
-              {% endfor %}
-            </div>
-            {% else %}
-            <div class="q-fill-wrap">
-              <input type="text" name="q{{ question.pk }}" class="ml-input"
-                     style="font-size:14px;"
-                     placeholder="Type your answer…"
-                     autocomplete="off" autocorrect="off" spellcheck="false">
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-                <path d="M2 12l2.5-2.5L12 2l2 2-7.5 7.5L2 14v-2z"
-                      stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-              </svg>
-            </div>
-            {% endif %}
-          </div>
+        <div class="ml-freeform-questions" data-qhl="ls-sec-{{ forloop.counter0 }}">
+          {{ section.questions_html|safe }}
         </div>
-        {% empty %}
-        <p style="font-size:13px;color:var(--muted);padding:24px 0;">No questions in this section yet.</p>
-        {% endfor %}
 
         <!-- Section nav -->
         <div class="flex items-center justify-between pt-6 mt-2"
@@ -465,7 +432,7 @@ function setHlColorLS(cls) {
   const LS_KEY = 'ls-hl-{{ attempt.pk }}';
 
   function getZone(node) {
-    return node?.parentElement?.closest('.q-text[data-qhl]') || null;
+    return node?.parentElement?.closest('.ml-freeform-questions, .q-text[data-qhl]') || null;
   }
 
   function attachRemove(span) {
@@ -480,8 +447,9 @@ function setHlColorLS(cls) {
 
   function save() {
     const data = {};
-    document.querySelectorAll('.q-text[data-qhl]').forEach(el => {
-      data[el.dataset.qhl] = el.innerHTML;
+    document.querySelectorAll('.ml-freeform-questions, .q-text[data-qhl]').forEach(el => {
+      const key = el.dataset.qhl;
+      if (key) data[key] = el.innerHTML;
     });
     try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(_) {}
   }
@@ -489,9 +457,10 @@ function setHlColorLS(cls) {
   function restore() {
     try {
       const data = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
-      document.querySelectorAll('.q-text[data-qhl]').forEach(el => {
-        if (data[el.dataset.qhl]) {
-          el.innerHTML = data[el.dataset.qhl];
+      document.querySelectorAll('.ml-freeform-questions, .q-text[data-qhl]').forEach(el => {
+        const key = el.dataset.qhl;
+        if (key && data[key]) {
+          el.innerHTML = data[key];
           el.querySelectorAll('.hl').forEach(attachRemove);
         }
       });

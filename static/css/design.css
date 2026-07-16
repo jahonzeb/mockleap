@@ -199,10 +199,10 @@
 
 /* Dark mode question text */
 .dark .q-text         { color: #cfc8bc !important; }
-.dark .q-label        { border-color: rgba(255,255,255,.12) !important; }
-.dark .q-label span   { color: #cfc8bc !important; }
-.dark .q-label:hover  { background: rgba(255,255,255,.06) !important; border-color: rgba(255,255,255,.25) !important; }
-.dark .q-label:has(input:checked) { background: rgba(255,255,255,.10) !important; border-color: rgba(255,255,255,.45) !important; }
+.dark .q-label, .dark .mc-label { border-color: rgba(255,255,255,.12) !important; }
+.dark .q-label span, .dark .mc-label span { color: #cfc8bc !important; }
+.dark .q-label:hover, .dark .mc-label:hover { background: rgba(255,255,255,.06) !important; border-color: rgba(255,255,255,.25) !important; }
+.dark .q-label:has(input:checked), .dark .mc-label:has(input:checked) { background: rgba(255,255,255,.10) !important; border-color: rgba(255,255,255,.45) !important; }
 
 /* Dark mode group header */
 .dark .q-group-header    { background: rgba(255,255,255,.05) !important; border-left-color: var(--accent) !important; }
@@ -280,8 +280,9 @@
 
 /* ── 10. QUESTION NUMBERS (IELTS dark circles) ───────────────── */
 .q-num {
-  width: 28px !important; height: 28px !important;
-  border-radius: 50% !important;
+  min-width: 28px !important; height: 28px !important;
+  padding: 0 6px !important;
+  border-radius: 14px !important;
   background: var(--ink) !important;
   color: var(--bg) !important;
   font-size: 11.5px !important; font-weight: 700 !important;
@@ -293,11 +294,21 @@
 
 /* ── 11. QUESTION BLOCK ──────────────────────────────────────── */
 .q-block {
-  display: flex;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 12px;
+  row-gap: 8px;
   padding: 16px 0;
   border-bottom: 1px solid var(--border);
-  align-items: flex-start;
+  align-items: start;
+}
+.q-block > .q-num {
+  grid-column: 1;
+  grid-row: 1;
+  margin-top: 0;
+}
+.q-block > *:not(.q-num) {
+  grid-column: 2;
 }
 .q-block:last-child { border-bottom: none; }
 
@@ -311,7 +322,7 @@
 }
 
 /* MCQ option label text */
-.q-label span {
+.q-label span, .mc-label span {
   font-family: 'Newsreader', Georgia, serif;
   font-size: 15px;
   line-height: 1.7;
@@ -319,7 +330,7 @@
 }
 
 /* ── 12. MCQ OPTIONS ─────────────────────────────────────────── */
-.q-label {
+.q-label, .mc-label {
   display: flex !important;
   align-items: flex-start !important;
   gap: 10px !important;
@@ -333,15 +344,15 @@
   color: var(--ink);
   line-height: 1.5;
 }
-.q-label:hover {
+.q-label:hover, .mc-label:hover {
   background: color-mix(in srgb, var(--ink) 5%, transparent) !important;
   border-color: var(--ink-2) !important;
 }
-.q-label:has(input:checked) {
+.q-label:has(input:checked), .mc-label:has(input:checked) {
   background: color-mix(in srgb, var(--ink) 8%, transparent) !important;
   border-color: var(--ink) !important;
 }
-.q-label input[type="radio"] {
+.q-label input[type="radio"], .mc-label input[type="radio"], .mc-label input[type="checkbox"] {
   width: 15px !important; height: 15px !important;
   flex-shrink: 0 !important; margin-top: 2px !important;
   accent-color: var(--ink) !important;
@@ -380,6 +391,34 @@
   font-size: 14px !important;
   padding-right: 36px !important;
   font-family: 'Geist', sans-serif !important;
+}
+.ml-input-inline {
+  font-family: 'Geist Mono', monospace;
+  font-size: 14px !important;
+  font-weight: 600;
+  padding: 4px 8px;
+  margin: 0 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04) inset;
+}
+.ml-input-inline:focus {
+  border-color: var(--ink-2);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ink) 15%, transparent);
+}
+.dark .ml-input-inline {
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.15);
+  color: #e8e0d4;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3) inset;
+}
+.dark .ml-input-inline:focus {
+  border-color: rgba(255,255,255,.40);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.15);
 }
 .q-fill-wrap svg {
   position: absolute;

@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-
 class ReadingTest(models.Model):
     TYPE_ACADEMIC = 'academic'
     TYPE_GENERAL = 'general'
@@ -17,97 +16,48 @@ class ReadingTest(models.Model):
     def __str__(self):
         return self.title
 
-
 class ReadingPassage(models.Model):
     test = models.ForeignKey(ReadingTest, on_delete=models.CASCADE, related_name='passages')
     order = models.PositiveSmallIntegerField(default=1)
     title = models.CharField(max_length=300)
     content = models.TextField()
-    source = models.CharField(max_length=200, blank=True)
+    source = models.CharField(max_length=255, blank=True)
+    
+    questions_html = models.TextField(blank=True, help_text="Raw HTML for the questions section")
+    answer_key = models.JSONField(default=dict, help_text="JSON mapping of question numbers to correct answers e.g. {'1': 'A', '2': 'TRUE'}")
 
     class Meta:
         ordering = ['order']
 
     def __str__(self):
-        return f'{self.test.title} — Passage {self.order}'
+        return f"Passage {self.order}: {self.title}"
 
     @property
     def paragraphs(self):
         paras = [p.strip() for p in self.content.split('\n\n') if p.strip()]
-        # Skip leading paragraph if it duplicates the title field
         if paras and paras[0].strip() == self.title.strip():
             paras = paras[1:]
         return paras
 
-
-class QuestionGroup(models.Model):
-    TYPE_MCQ     = 'mcq'
-    TYPE_TFNG    = 'tfng'
-    TYPE_FILL    = 'fill'
-    TYPE_TABLE   = 'table'
-    TYPE_NOTE    = 'note'
-    TYPE_SUMMARY = 'summary'
-    TYPE_MATCH   = 'match'
-    TYPE_SHORT   = 'short'
-    TYPE_CHOICES = [
-        (TYPE_MCQ,     'Multiple Choice'),
-        (TYPE_TFNG,    'True / False / Not Given'),
-        (TYPE_FILL,    'Fill in the Blank'),
-        (TYPE_TABLE,   'Table Completion'),
-        (TYPE_NOTE,    'Note Completion'),
-        (TYPE_SUMMARY, 'Summary Completion'),
-        (TYPE_MATCH,   'Matching Headings'),
-        (TYPE_SHORT,   'Short Answer'),
-    ]
-    passage = models.ForeignKey(ReadingPassage, on_delete=models.CASCADE, related_name='question_groups')
-    question_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
-    instructions = models.TextField()
-    order = models.PositiveSmallIntegerField(default=1)
-
-    class Meta:
-        ordering = ['order']
-
-
-class Question(models.Model):
-    group = models.ForeignKey(QuestionGroup, on_delete=models.CASCADE, related_name='questions')
-    number = models.PositiveSmallIntegerField()
-    text = models.TextField()
-    option_a = models.CharField(max_length=500, blank=True)
-    option_b = models.CharField(max_length=500, blank=True)
-    option_c = models.CharField(max_length=500, blank=True)
-    option_d = models.CharField(max_length=500, blank=True)
-    correct_answer = models.CharField(max_length=200)
-    explanation = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ['number']
-
-    @property
-    def choices(self):
-        result = []
-        for letter, text in [('A', self.option_a), ('B', self.option_b), ('C', self.option_c), ('D', self.option_d)]:
-            if text:
-                result.append((letter, text))
-        return result
-
-
 class ReadingAttempt(models.Model):
     STATUS_IN_PROGRESS = 'in_progress'
-    STATUS_SUBMITTED = 'submitted'
-    STATUS_CHOICES = [(STATUS_IN_PROGRESS, 'In Progress'), (STATUS_SUBMITTED, 'Submitted')]
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reading_attempts')
+    STATUS_SUBMITTED = 'completed'
+    STATUS_CHOICES = (
+        (STATUS_IN_PROGRESS, 'In Progress'),
+        (STATUS_SUBMITTED, 'Completed'),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     test = models.ForeignKey(ReadingTest, on_delete=models.CASCADE)
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default=STATUS_IN_PROGRESS)
     started_at = models.DateTimeField(auto_now_add=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
-    time_taken_seconds = models.PositiveIntegerField(default=0)
-    score_raw = models.PositiveSmallIntegerField(null=True, blank=True)
-    band_score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_IN_PROGRESS)
+    
     answers = models.JSONField(default=dict)
+    score_raw = models.PositiveIntegerField(null=True, blank=True)
+    band_score = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
 
-    class Meta:
-        ordering = ['-started_at']
+    def calculate_score(self):
+        pass
 
     def __str__(self):
-        return f'{self.user.email} — {self.test.title}'
+        return f"{self.user.username} - {self.test.title} ({self.status})"

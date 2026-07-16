@@ -31,11 +31,6 @@ INSTALLED_APPS = [
     'apps.listening',
     'apps.writing',
     'apps.speaking',
-    'apps.teachers',
-    'apps.rankings',
-    'apps.analytics',
-    'apps.community',
-    'apps.notifications',
 ]
 
 MIDDLEWARE = [

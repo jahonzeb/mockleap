@@ -16,10 +16,6 @@ urlpatterns = [
     path('listening/', include('apps.listening.urls')),
     path('writing/', include('apps.writing.urls')),
     path('speaking/', include('apps.speaking.urls')),
-    path('teachers/', include('apps.teachers.urls')),
-    path('rankings/', include('apps.rankings.urls')),
-    path('community/', include('apps.community.urls')),
-    path('notifications/', include('apps.notifications.urls')),
     path('profile/', include('apps.accounts.urls')),
 ]
 

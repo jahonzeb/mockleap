@@ -150,11 +150,6 @@
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </div>
-    <a href="{% url 'reading:list' %}"  style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Reading</a>
-    <a href="{% url 'listening:list' %}" style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Listening</a>
-    <a href="{% url 'writing:list' %}"  style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Writing</a>
-    <a href="{% url 'speaking:list' %}" style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Speaking</a>
-    <a href="{% url 'community:rooms' %}" style="padding:12px 8px;font-size:15px;font-weight:500;text-decoration:none;color:var(--ink);border-bottom:.5px solid var(--border);display:block;">Community</a>
     <div style="display:flex;gap:8px;margin-top:12px;">
       {% if user.is_authenticated %}
         <a href="{% url 'dashboard:home' %}" class="ml-btn ml-btn-ghost ml-btn-sm" style="flex:1;justify-content:center;">Dashboard</a>
@@ -178,7 +173,6 @@
       <a href="{% url 'listening:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Listening</a>
       <a href="{% url 'writing:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Writing</a>
       <a href="{% url 'speaking:list' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Speaking</a>
-      <a href="{% url 'community:rooms' %}" class="t-body" style="font-size:13px;font-weight:500;text-decoration:none;color:var(--ink-2);">Community</a>
     </div>
   </div>
   <div class="ml-row" style="gap:8px;flex-shrink:0;">
@@ -700,11 +694,6 @@
       </ul>
     </div>
     <div>
-      <div class="t-eyebrow" style="margin-bottom:14px;">Community</div>
-      <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">
-        <li><a href="{% url 'community:rooms' %}" class="t-body" style="font-size:13px;">Forums</a></li>
-        <li><a href="{% url 'rankings:leaderboard' %}" class="t-body" style="font-size:13px;">Leaderboard</a></li>
-      </ul>
     </div>
     <div>
       <div class="t-eyebrow" style="margin-bottom:14px;">Company</div>
