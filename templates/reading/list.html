@@ -18,6 +18,8 @@
         {% with pc=test.passages.count %}
         {% if pc == 3 %}
         <span class="ml-chip mb-2" style="background:var(--surface-2);color:var(--muted);">Full test</span>
+        {% elif pc == 1 %}
+        <span class="ml-chip mb-2" style="background:var(--surface-2);color:var(--muted);">Passage {{ test.passages.first.order }}</span>
         {% elif pc > 0 %}
         <span class="ml-chip mb-2" style="background:var(--surface-2);color:var(--muted);">{{ pc }} passage{{ pc|pluralize }}</span>
         {% endif %}
