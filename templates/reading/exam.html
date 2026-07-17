@@ -153,9 +153,13 @@
         <div style="height:20px;"></div>
         {% endif %}
         <div class="passage-body" id="ptext-{{ passage.order }}">
-          {% for para in passage.paragraphs %}
-          <p>{{ para }}</p>
-          {% endfor %}
+          {% if "<" in passage.content %}
+            {{ passage.content|safe }}
+          {% else %}
+            {% for para in passage.paragraphs %}
+            <p>{{ para }}</p>
+            {% endfor %}
+          {% endif %}
         </div>
       </div>
       {% endfor %}
