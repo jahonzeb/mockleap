@@ -127,3 +127,30 @@ mockleap/
 3. `ALLOWED_HOSTS` ga serveringiz domenini qo'shing
 4. `python manage.py collectstatic` buyrug'ini ishga tushiring
 5. PostgreSQL uchun `DATABASE_URL=postgres://user:pass@host/dbname` formatida yozing
+
+---
+
+## Render.com ga Deploy qilish
+
+Loyiha Render.com uchun to'liq moslashtirilgan (`render.yaml` va `build.sh` mavjud).
+
+### 1-usul: Blueprint orqali (Tavsiya etiladi — 1 tugma bilan)
+1. GitHub repozitoriyangizga o'zgarishlarni `git push` qiling.
+2. [Render Dashboard](https://dashboard.render.com) ga kiring.
+3. **New +** tugmasini bosing va **Blueprint** ni tanlang.
+4. `mockleap` repozitoriyangizni ulang.
+5. Render avtomatik tarzda `render.yaml` dagi sozlamalarni aniqlaydi:
+   - Web Service (`mockleap`)
+   - PostgreSQL Database (`mockleap-db`)
+6. **Apply** tugmasini bosing. Loyiha avtomatik build bo'ladi va ishga tushadi!
+
+### 2-usul: Web Service qo'lda yaratish
+1. **New +** -> **Web Service**
+2. Build Command: `./build.sh`
+3. Start Command: `gunicorn config.wsgi:application`
+4. Environment Variables:
+   - `PYTHON_VERSION`: `3.11.9`
+   - `DEBUG`: `False`
+   - `ALLOWED_HOSTS`: `*`
+   - `SECRET_KEY`: *(Generate qiling yoki o'zingiz yozing)*
+   - `DATABASE_URL`: *(Render PostgreSQL connection string)*
