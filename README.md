@@ -132,7 +132,7 @@ mockleap/
 
 ## Render.com ga Deploy qilish
 
-Loyiha Render.com uchun to'liq moslashtirilgan (`render.yaml` va `build.sh` mavjud).
+Loyiha mavjud SQLite (`db.sqlite3`) bazasi va barcha testlari bilan to'g'ridan-to'g'ri Render.com da ishlashga to'liq sozlangan.
 
 ### 1-usul: Blueprint orqali (Tavsiya etiladi — 1 tugma bilan)
 1. GitHub repozitoriyangizga o'zgarishlarni `git push` qiling.
@@ -141,16 +141,21 @@ Loyiha Render.com uchun to'liq moslashtirilgan (`render.yaml` va `build.sh` mavj
 4. `mockleap` repozitoriyangizni ulang.
 5. Render avtomatik tarzda `render.yaml` dagi sozlamalarni aniqlaydi:
    - Web Service (`mockleap`)
-   - PostgreSQL Database (`mockleap-db`)
-6. **Apply** tugmasini bosing. Loyiha avtomatik build bo'ladi va ishga tushadi!
+6. **Apply** tugmasini bosing. Loyiha avtomatik build bo'ladi va mavjud `db.sqlite3` bazasi bilan ishga tushadi!
 
 ### 2-usul: Web Service qo'lda yaratish
 1. **New +** -> **Web Service**
-2. Build Command: `./build.sh`
-3. Start Command: `gunicorn config.wsgi:application`
+2. `mockleap` repozitoriyasini tanlang
+3. Parametrlar:
+   - **Name**: `mockleap`
+   - **Region**: `Frankfurt`
+   - **Branch**: `main`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `./build.sh`
+   - **Start Command**: `gunicorn config.wsgi:application`
+   - **Instance Type**: `Free`
 4. Environment Variables:
    - `PYTHON_VERSION`: `3.11.9`
    - `DEBUG`: `False`
    - `ALLOWED_HOSTS`: `*`
    - `SECRET_KEY`: *(Generate qiling yoki o'zingiz yozing)*
-   - `DATABASE_URL`: *(Render PostgreSQL connection string)*
